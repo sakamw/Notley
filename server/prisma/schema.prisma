@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String   @id @default(uuid()) @map("user_id")
+  firstName  String   @map("first_name")
+  lastName   String   @map("last_name")
+  username   String   @unique @map("username")
+  email      String   @unique @map("email_address")
+  password   String   @map("password")
+  avatar     String?  @map("avatar_img")
+  dateJoined DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  isDeleted  Boolean  @default(false) @map("is_deleted")
+
+  entries Entry[]
+  activityLogs ActivityLog[]
+
+  @@map("user")
+}
+
+model Category {
+  id    String  @id @default(uuid())
+  name  String  @unique
+  entries Entry[]
+}
+
+model Entry {
+  id            String   @id @default(uuid()) @map("entry_id")
+  title         String   @map("title")
+  synopsis      String   @map("entry_synopsis")
+  content       String   @map("content")
+  isDeleted     Boolean  @default(false) @map("is_deleted")
+  isPublic      Boolean  @default(false)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  authorId   String
+  author     User   @relation(fields: [authorId], references: [id])
+
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id])
+  activityLogs ActivityLog[]
+
+  @@map("entry")
+}
+
+model ActivityLog {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  entryId   String?
+  entry     Entry?   @relation(fields: [entryId], references: [id])
+  action    String
+  details   String?
+  createdAt DateTime @default(now())
+}

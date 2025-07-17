@@ -1,7 +1,6 @@
 import { Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import { AuthRequest } from "../middlewares/userMiddleware";
-import bcrypt from "bcryptjs";
 import cloudinary from "cloudinary";
 
 const client = new PrismaClient();
@@ -90,43 +89,6 @@ export const updateUserInfo = async (req: AuthRequest, res: Response) => {
     return void res
       .status(500)
       .json({ message: "Failed to update user info." });
-  }
-};
-
-export const updateUserPassword = async (req: AuthRequest, res: Response) => {
-  try {
-    const userId = req.user?.id;
-    if (!userId) {
-      res.status(401).json({ message: "Unauthorized." });
-      return;
-    }
-    const { currentPassword, newPassword } = req.body;
-    if (!currentPassword || !newPassword) {
-      res
-        .status(400)
-        .json({ message: "Current and new password are required." });
-      return;
-    }
-    const user = await client.user.findUnique({
-      where: { id: userId },
-    });
-    if (!user) {
-      res.status(404).json({ message: "User not found." });
-      return;
-    }
-    const isMatch = await bcrypt.compare(currentPassword, user.password);
-    if (!isMatch) {
-      res.status(400).json({ message: "Current password is incorrect." });
-      return;
-    }
-    const hashed = await bcrypt.hash(newPassword, 10);
-    await client.user.update({
-      where: { id: userId },
-      data: { password: hashed },
-    });
-    res.json({ message: "Password updated successfully." });
-  } catch (e) {
-    res.status(500).json({ message: "Failed to update password." });
   }
 };
 

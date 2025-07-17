@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken";
+import { AuthRequest } from "../middlewares/userMiddleware";
 
 const client = new PrismaClient();
 
@@ -67,7 +68,7 @@ export const login = async (req: Request, res: Response) => {
     }
 
     const token = jwt.sign(userDetails, process.env.JWT_SECRET);
-    res.cookie("authToken", token).json({ ...userDetails, token });
+    res.cookie("authToken", token).json({ ...userDetails });
   } catch (error) {
     res.status(500).json({ message: "Server error during login." });
   }
@@ -81,4 +82,47 @@ export const logout = async (_req: Request, res: Response) => {
     path: "/",
   });
   res.json({ message: "Logged out successfully" });
+};
+
+export const updateUserPassword = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      res.status(401).json({ message: "Unauthorized." });
+      return;
+    }
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword) {
+      res
+        .status(400)
+        .json({ message: "Current and new password are required." });
+      return;
+    }
+    if (currentPassword == newPassword) {
+      res
+        .status(400)
+        .json({ message: "Current and new password should be different." });
+      return;
+    }
+    const user = await client.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) {
+      res.status(404).json({ message: "User not found." });
+      return;
+    }
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      res.status(400).json({ message: "Current password is incorrect." });
+      return;
+    }
+    const hashed = await bcrypt.hash(newPassword, 10);
+    await client.user.update({
+      where: { id: userId },
+      data: { password: hashed },
+    });
+    res.json({ message: "Password updated successfully." });
+  } catch (e) {
+    res.status(500).json({ message: "Failed to update password." });
+  }
 };

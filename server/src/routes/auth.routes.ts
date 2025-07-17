@@ -4,7 +4,14 @@ import {
   checkEmailAndUsernameReuse,
   verifyPassStrength,
 } from "../middlewares/authMiddlewares";
-import { register, login, logout } from "../controllers/auth.controller";
+import {
+  register,
+  login,
+  logout,
+  updateUserPassword,
+} from "../controllers/auth.controller";
+import { verifyNewPassStrength } from "../middlewares/newPassStrength";
+import { authenticateJWT } from "../middlewares/userMiddleware";
 
 const router: Router = Router();
 
@@ -17,5 +24,11 @@ router.post(
 );
 router.post("/login", login);
 router.post("/logout", logout);
+router.post(
+  "/password",
+  authenticateJWT,
+  verifyNewPassStrength,
+  updateUserPassword
+);
 
 export default router;

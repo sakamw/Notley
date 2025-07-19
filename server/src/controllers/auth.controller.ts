@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken";
 import { AuthRequest } from "../middlewares/userMiddleware";
+import nodemailer from "nodemailer";
 
 const client = new PrismaClient();
 
@@ -124,5 +125,99 @@ export const updateUserPassword = async (req: AuthRequest, res: Response) => {
     res.json({ message: "Password updated successfully." });
   } catch (e) {
     res.status(500).json({ message: "Failed to update password." });
+  }
+};
+
+export const forgotPassword = async (req: Request, res: Response) => {
+  const { email } = req.body;
+  try {
+    const oldUser = await client.user.findUnique({ where: { email } });
+    if (!oldUser) {
+      return res.status(200).json({
+        message: "A reset link has been sent.",
+      });
+    }
+    if (!process.env.JWT_SECRET) {
+      return res.status(500).json({ message: "Server configuration error." });
+    }
+    const secret = process.env.JWT_SECRET + oldUser.password;
+    const token = jwt.sign({ email: oldUser.email, id: oldUser.id }, secret, {
+      expiresIn: "5m",
+    });
+    const link = `http://localhost:4800/api/auth/reset-password/${oldUser.id}/${token}`;
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: oldUser.email,
+      subject: "Password Reset Request",
+      html: `<p>You requested a password reset. Click <a href="${link}">here</a> to reset your password. This link will expire in 5 minutes.</p>`,
+    });
+
+    res.status(200).json({
+      message: "A reset link has been sent.",
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error generating reset link." });
+  }
+};
+
+export const resetPassword = async (req: Request, res: Response) => {
+  const { id, token } = req.params;
+  if (req.method === "GET") {
+    try {
+      const oldUser = await client.user.findUnique({ where: { id } });
+      if (!oldUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      if (!process.env.JWT_SECRET) {
+        return res.status(500).json({ message: "Server configuration error." });
+      }
+      const secret = process.env.JWT_SECRET + oldUser.password;
+      try {
+        jwt.verify(token, secret);
+        return res
+          .status(200)
+          .json({ message: "Token verified. You can reset your password." });
+      } catch (error) {
+        return res.status(400).json({ message: "Invalid or expired token." });
+      }
+    } catch (error) {
+      return res.status(500).json({ message: "Error verifying reset link." });
+    }
+  } else if (req.method === "POST") {
+    const { password } = req.body;
+    if (!password) {
+      return res.status(400).json({ message: "Password is required." });
+    }
+    try {
+      const oldUser = await client.user.findUnique({ where: { id } });
+      if (!oldUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      if (!process.env.JWT_SECRET) {
+        return res.status(500).json({ message: "Server configuration error." });
+      }
+      const secret = process.env.JWT_SECRET + oldUser.password;
+      try {
+        jwt.verify(token, secret);
+        const hashed = await bcrypt.hash(password, 10);
+        await client.user.update({ where: { id }, data: { password: hashed } });
+        return res.status(200).json({ message: "Password reset successful." });
+      } catch (error) {
+        return res.status(400).json({ message: "Invalid or expired token." });
+      }
+    } catch (error) {
+      return res.status(500).json({ message: "Error resetting password." });
+    }
+  } else {
+    return res.status(405).json({ message: "Method not allowed." });
   }
 };

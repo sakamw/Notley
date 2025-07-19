@@ -9,6 +9,8 @@ import {
   login,
   logout,
   updateUserPassword,
+  forgotPassword,
+  resetPassword,
 } from "../controllers/auth.controller";
 import { verifyNewPassStrength } from "../middlewares/newPassStrength";
 import { authenticateJWT } from "../middlewares/userMiddleware";
@@ -30,5 +32,9 @@ router.post(
   verifyNewPassStrength,
   updateUserPassword
 );
+
+router.post("/forgot-password", forgotPassword);
+router.get("/reset-password/:id/:token", resetPassword);
+router.post("/reset-password/:id/:token", resetPassword);
 
 export default router;

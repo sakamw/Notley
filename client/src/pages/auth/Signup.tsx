@@ -28,13 +28,14 @@ function Signup() {
       minHeight="100vh"
       bgcolor="background.default"
       px={2}
+      sx={{ mt: { xs: "5.6rem", sm: "6.4rem" } }}
     >
       <Paper
         elevation={3}
         sx={{
           p: { xs: 2, sm: 4 },
           borderRadius: 4,
-          width: { xs: "100%", sm: 370 },
+          width: { xs: "100%", sm: 370, md: 420 },
           maxWidth: 1,
         }}
       >
@@ -48,7 +49,7 @@ function Signup() {
           Sign Up
         </Typography>
         <Typography variant="body2" align="center" color="text.primary" mb={3}>
-          Create your NoteMaster account
+          Create your Notely account
         </Typography>
         <Box component="form" noValidate>
           <Typography variant="subtitle2" mb={0.5} color="text.primary">
@@ -58,6 +59,7 @@ function Signup() {
             fullWidth
             margin="dense"
             placeholder="Enter your first name"
+            required
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -73,6 +75,7 @@ function Signup() {
             fullWidth
             margin="dense"
             placeholder="Enter your last name"
+            required
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -88,6 +91,7 @@ function Signup() {
             fullWidth
             margin="dense"
             placeholder="Choose a username"
+            required
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -103,6 +107,7 @@ function Signup() {
             fullWidth
             margin="dense"
             placeholder="Enter your email address"
+            required
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -119,6 +124,7 @@ function Signup() {
             margin="dense"
             placeholder="Enter your password"
             type={showPassword ? "text" : "password"}
+            required
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -145,6 +151,7 @@ function Signup() {
             margin="dense"
             placeholder="Confirm your password"
             type={showConfirm ? "text" : "password"}
+            required
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -173,7 +180,7 @@ function Signup() {
           </Button>
           <Typography align="center" variant="body2" color="text.primary">
             Already have an account?{" "}
-            <Link component={RouterLink} to="/" color="primary">
+            <Link component={RouterLink} to="/login" color="primary">
               Sign in
             </Link>
           </Typography>

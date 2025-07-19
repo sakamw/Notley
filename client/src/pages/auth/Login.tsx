@@ -47,7 +47,7 @@ function Login() {
           Sign In
         </Typography>
         <Typography variant="body2" align="center" color="text.primary" mb={3}>
-          Welcome back to NoteMaster
+          Welcome back to Notely
         </Typography>
         <Box component="form" noValidate>
           <Typography variant="subtitle2" mb={0.5} color="text.primary">
@@ -57,6 +57,7 @@ function Login() {
             fullWidth
             margin="dense"
             placeholder="Enter your email address or username"
+            required
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -73,6 +74,7 @@ function Login() {
             margin="dense"
             placeholder="Enter your password"
             type={showPassword ? "text" : "password"}
+            required
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">

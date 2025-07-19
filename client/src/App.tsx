@@ -4,6 +4,8 @@ import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import Header from "./pages/Header";
+import Footer from "./components/common/Footer";
+import LandingPage from "./pages/LandingPage";
 
 const theme = createTheme({
   palette: {
@@ -31,10 +33,12 @@ function App() {
       <BrowserRouter>
         <Header />
         <Routes>
-          <Route path="/" element={<Login />} />
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
         </Routes>
+        <Footer />
       </BrowserRouter>
     </ThemeProvider>
   );

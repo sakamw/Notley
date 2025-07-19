@@ -1,21 +1,44 @@
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Box,
-  Button,
-  Link,
-  Stack,
-} from "@mui/material";
-import { Link as RouterLink } from "react-router-dom";
+import { AppBar, Toolbar, Typography, Box, Button, Stack } from "@mui/material";
+import { Link as RouterLink, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+
+function scrollToSection(id: string) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
 
 function HeaderPublic() {
+  const [scrolled, setScrolled] = useState(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    if (location.pathname === "/" && location.hash) {
+      const id = location.hash.replace("#", "");
+      setTimeout(() => scrollToSection(id), 100);
+    }
+  }, [location]);
+
   return (
     <AppBar
-      position="static"
+      position="fixed"
       color="transparent"
-      elevation={0}
-      sx={{ borderBottom: "1px solid #e0e0e0" }}
+      elevation={scrolled ? 2 : 0}
+      sx={{
+        borderBottom: ".1rem solid #e0e0e0",
+        zIndex: 1000,
+        bgcolor: scrolled ? "background.paper" : "transparent",
+        transition: "background-color 0.3s, box-shadow 0.3s",
+      }}
     >
       <Toolbar sx={{ justifyContent: "space-between", px: { xs: 1, sm: 4 } }}>
         {/* Logo */}
@@ -27,7 +50,7 @@ function HeaderPublic() {
           to="/"
           sx={{ textDecoration: "none" }}
         >
-          NoteMaster
+          NOTELY
         </Typography>
         {/* Navigation Links */}
         <Stack
@@ -35,52 +58,33 @@ function HeaderPublic() {
           spacing={3}
           sx={{ display: { xs: "none", md: "flex" } }}
         >
-          <Link
-            component={RouterLink}
-            to="#features"
-            color="text.primary"
-            underline="none"
-            fontWeight={500}
-            sx={{ fontSize: 16 }}
+          <Button
+            variant="text"
+            onClick={() => scrollToSection("features")}
+            sx={{ color: "text.primary", fontWeight: 500, fontSize: 16 }}
           >
             Features
-          </Link>
-          <Link
-            component={RouterLink}
-            to="#pricing"
-            color="text.primary"
-            underline="none"
-            fontWeight={500}
-            sx={{ fontSize: 16 }}
-          >
-            Pricing
-          </Link>
-          <Link
-            component={RouterLink}
-            to="#about"
-            color="text.primary"
-            underline="none"
-            fontWeight={500}
-            sx={{ fontSize: 16 }}
+          </Button>
+          <Button
+            variant="text"
+            onClick={() => scrollToSection("about")}
+            sx={{ color: "text.primary", fontWeight: 500, fontSize: 16 }}
           >
             About
-          </Link>
-          <Link
-            component={RouterLink}
-            to="#contact"
-            color="text.primary"
-            underline="none"
-            fontWeight={500}
-            sx={{ fontSize: 16 }}
+          </Button>
+          <Button
+            variant="text"
+            onClick={() => scrollToSection("contact")}
+            sx={{ color: "text.primary", fontWeight: 500, fontSize: 16 }}
           >
             Contact
-          </Link>
+          </Button>
         </Stack>
         {/* Auth Buttons */}
         <Box>
           <Button
             component={RouterLink}
-            to="/"
+            to="/login"
             color="inherit"
             sx={{
               fontWeight: 500,

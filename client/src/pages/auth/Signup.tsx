@@ -1,32 +1,131 @@
+import { useState } from "react";
 import {
   Box,
   Button,
-  Paper,
   TextField,
   Typography,
-  InputAdornment,
+  Snackbar,
+  Alert,
   IconButton,
+  useTheme,
+  Paper,
   Link,
 } from "@mui/material";
-import EmailIcon from "@mui/icons-material/Email";
-import LockIcon from "@mui/icons-material/Lock";
-import PersonIcon from "@mui/icons-material/Person";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import { useNavigate, Link as RouterLink } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import axiosInstance from "../../api/axios";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import { useState } from "react";
-import { Link as RouterLink } from "react-router-dom";
 
-function Signup() {
+interface User {
+  firstName: string;
+  lastName: string;
+  email: string;
+  username: string;
+  password: string;
+}
+
+const Signup = () => {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [confPass, setConfPass] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
+  const [showConfPassword, setShowConfPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const navigate = useNavigate();
+  const theme = useTheme();
+
+  const { isPending, mutate } = useMutation({
+    mutationKey: ["signup-user"],
+    mutationFn: async (newUser: User) => {
+      try {
+        const response = await axiosInstance.post("/auth/register", newUser);
+        return response.data;
+      } catch (err: unknown) {
+        if (
+          err &&
+          typeof err === "object" &&
+          "response" in err &&
+          err.response &&
+          typeof err.response === "object" &&
+          "data" in err.response &&
+          err.response.data &&
+          typeof err.response.data === "object" &&
+          "message" in err.response.data
+        ) {
+          throw new Error(
+            (err.response.data as { message?: string }).message ||
+              "Signup failed"
+          );
+        } else {
+          throw new Error("Signup failed");
+        }
+      }
+    },
+    onError: (error: unknown) => {
+      if (error instanceof Error && error.message) {
+        setError(error.message);
+      } else {
+        setError("Signup failed");
+      }
+      setOpenSnackbar(true);
+    },
+    onSuccess: (data) => {
+      setError("");
+      setSuccess(data.message || "Signup successful!");
+      setOpenSnackbar(true);
+      setTimeout(() => {
+        setSuccess("Redirecting you to login page...");
+        setOpenSnackbar(true);
+        setTimeout(() => {
+          setOpenSnackbar(false);
+          navigate("/login");
+        }, 1500);
+      }, 1500);
+    },
+  });
+
+  function handleSignUp() {
+    setError("");
+    setSuccess("");
+    if (
+      !firstName ||
+      !lastName ||
+      !email ||
+      !username ||
+      !password ||
+      !confPass
+    ) {
+      setError("Please fill in all fields.");
+      setOpenSnackbar(true);
+      return;
+    }
+    if (password !== confPass) {
+      setError("Passwords and confirm password should match");
+      setOpenSnackbar(true);
+      return;
+    }
+    const newUser = { firstName, lastName, email, username, password };
+    mutate(newUser);
+  }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    handleSignUp();
+  }
+
   return (
     <Box
       display="flex"
       justifyContent="center"
       alignItems="center"
       minHeight="100vh"
-      bgcolor="background.default"
+      bgcolor={theme.palette.background.default}
       px={2}
       sx={{ mt: { xs: "5.6rem", sm: "6.4rem" } }}
     >
@@ -51,132 +150,90 @@ function Signup() {
         <Typography variant="body2" align="center" color="text.primary" mb={3}>
           Create your Notely account
         </Typography>
-        <Box component="form" noValidate>
-          <Typography variant="subtitle2" mb={0.5} color="text.primary">
-            First Name
-          </Typography>
+        <Box component="form" onSubmit={handleSubmit} noValidate>
           <TextField
+            label="First Name"
             fullWidth
             margin="dense"
-            placeholder="Enter your first name"
             required
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <PersonIcon color="primary" />
-                </InputAdornment>
-              ),
-            }}
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
           />
-          <Typography variant="subtitle2" mt={2} mb={0.5} color="text.primary">
-            Last Name
-          </Typography>
           <TextField
+            label="Last Name"
             fullWidth
             margin="dense"
-            placeholder="Enter your last name"
             required
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <PersonIcon color="primary" />
-                </InputAdornment>
-              ),
-            }}
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            sx={{ mt: 2 }}
           />
-          <Typography variant="subtitle2" mt={2} mb={0.5} color="text.primary">
-            Username
-          </Typography>
           <TextField
+            label="Email"
             fullWidth
             margin="dense"
-            placeholder="Choose a username"
             required
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <AccountCircleIcon color="primary" />
-                </InputAdornment>
-              ),
-            }}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            sx={{ mt: 2 }}
           />
-          <Typography variant="subtitle2" mt={2} mb={0.5} color="text.primary">
-            Email Address
-          </Typography>
           <TextField
+            label="Username"
             fullWidth
             margin="dense"
-            placeholder="Enter your email address"
             required
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <EmailIcon color="primary" />
-                </InputAdornment>
-              ),
-            }}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            sx={{ mt: 2 }}
           />
-          <Typography variant="subtitle2" mt={2} mb={0.5} color="text.primary">
-            Password
-          </Typography>
           <TextField
-            fullWidth
-            margin="dense"
-            placeholder="Enter your password"
+            label="Password"
             type={showPassword ? "text" : "password"}
+            fullWidth
+            margin="dense"
             required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            sx={{ mt: 2 }}
             InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <LockIcon color="primary" />
-                </InputAdornment>
-              ),
               endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    onClick={() => setShowPassword((s) => !s)}
-                    edge="end"
-                  >
-                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
+                <IconButton
+                  onClick={() => setShowPassword((s) => !s)}
+                  edge="end"
+                >
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
               ),
             }}
           />
-          <Typography variant="subtitle2" mt={2} mb={0.5} color="text.primary">
-            Confirm Password
-          </Typography>
           <TextField
+            label="Confirm Password"
+            type={showConfPassword ? "text" : "password"}
             fullWidth
             margin="dense"
-            placeholder="Confirm your password"
-            type={showConfirm ? "text" : "password"}
             required
+            value={confPass}
+            onChange={(e) => setConfPass(e.target.value)}
+            sx={{ mt: 2 }}
             InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <LockIcon color="primary" />
-                </InputAdornment>
-              ),
               endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    onClick={() => setShowConfirm((s) => !s)}
-                    edge="end"
-                  >
-                    {showConfirm ? <VisibilityOff /> : <Visibility />}
-                  </IconButton>
-                </InputAdornment>
+                <IconButton
+                  onClick={() => setShowConfPassword((s) => !s)}
+                  edge="end"
+                >
+                  {showConfPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
               ),
             }}
           />
           <Button
-            fullWidth
+            type="submit"
             variant="contained"
-            size="large"
+            fullWidth
             sx={{ mt: 3, mb: 2 }}
+            disabled={isPending}
           >
-            Sign Up
+            {isPending ? "Signing Up..." : "Sign Up"}
           </Button>
           <Typography align="center" variant="body2" color="text.primary">
             Already have an account?{" "}
@@ -195,9 +252,25 @@ function Signup() {
             </Link>
           </Box>
         </Box>
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={3000}
+          onClose={() => setOpenSnackbar(false)}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        >
+          {error ? (
+            <Alert severity="error" onClose={() => setOpenSnackbar(false)}>
+              {error}
+            </Alert>
+          ) : (
+            <Alert severity="success" onClose={() => setOpenSnackbar(false)}>
+              {success}
+            </Alert>
+          )}
+        </Snackbar>
       </Paper>
     </Box>
   );
-}
+};
 
 export default Signup;

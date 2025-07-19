@@ -1,16 +1,58 @@
+import { useState } from "react";
 import {
   Box,
   Button,
   Paper,
   TextField,
   Typography,
-  InputAdornment,
+  Snackbar,
+  Alert,
   Link,
 } from "@mui/material";
-import EmailIcon from "@mui/icons-material/Email";
 import { Link as RouterLink } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import axiosInstance from "../../api/axios";
 
 function ForgotPassword() {
+  const [email, setEmail] = useState("");
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMsg, setSnackbarMsg] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
+    "success"
+  );
+
+  const { isPending, mutate } = useMutation({
+    mutationKey: ["forgot-password"],
+    mutationFn: async (payload: { email: string }) => {
+      const response = await axiosInstance.post(
+        "/auth/forgot-password",
+        payload
+      );
+      return response.data;
+    },
+    onError: () => {
+      setSnackbarMsg("Failed to send reset instructions. Please try again.");
+      setSnackbarSeverity("error");
+      setOpenSnackbar(true);
+    },
+    onSuccess: (data) => {
+      setSnackbarMsg(data.message || "A reset link has been sent.");
+      setSnackbarSeverity("success");
+      setOpenSnackbar(true);
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) {
+      setSnackbarMsg("Please enter your email address.");
+      setSnackbarSeverity("error");
+      setOpenSnackbar(true);
+      return;
+    }
+    mutate({ email });
+  };
+
   return (
     <Box
       display="flex"
@@ -41,29 +83,25 @@ function ForgotPassword() {
         <Typography variant="body2" align="center" color="text.primary" mb={3}>
           Enter your email to receive reset instructions
         </Typography>
-        <Box component="form" noValidate>
-          <Typography variant="subtitle2" mb={0.5} color="text.primary">
-            Email Address
-          </Typography>
+        <Box component="form" onSubmit={handleSubmit} noValidate>
           <TextField
             fullWidth
             margin="dense"
+            label="Email Address"
             placeholder="Enter your email address"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <EmailIcon color="primary" />
-                </InputAdornment>
-              ),
-            }}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
           />
           <Button
             fullWidth
             variant="contained"
             size="large"
             sx={{ mt: 3, mb: 2 }}
+            type="submit"
+            disabled={isPending}
           >
-            Send Reset Instructions
+            {isPending ? "Sending..." : "Send Reset Instructions"}
           </Button>
           <Box mt={2}>
             <Link
@@ -76,6 +114,19 @@ function ForgotPassword() {
             </Link>
           </Box>
         </Box>
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={3000}
+          onClose={() => setOpenSnackbar(false)}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        >
+          <Alert
+            severity={snackbarSeverity}
+            onClose={() => setOpenSnackbar(false)}
+          >
+            {snackbarMsg}
+          </Alert>
+        </Snackbar>
       </Paper>
     </Box>
   );

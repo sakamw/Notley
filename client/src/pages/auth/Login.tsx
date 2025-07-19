@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Box,
   Button,
@@ -14,11 +15,64 @@ import EmailIcon from "@mui/icons-material/Email";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import LockIcon from "@mui/icons-material/Lock";
-import { useState } from "react";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import axiosInstance from "../../api/axios";
+import { toast } from "react-toastify";
+import { useAuth } from "../../store/useStore";
 
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
+  const [identifier, setIdentifier] = useState("");
+  const [password, setPassword] = useState("");
+  const [formError, setFormError] = useState("");
+  const navigate = useNavigate();
+  const { setUser } = useAuth();
+
+  const { isPending, mutate } = useMutation({
+    mutationKey: ["login-user"],
+    mutationFn: async (loginDetails: {
+      identifier: string;
+      password: string;
+    }) => {
+      const response = await axiosInstance.post("/auth/login", loginDetails);
+      return response.data;
+    },
+    onError: (err: unknown) => {
+      if (
+        err &&
+        typeof err === "object" &&
+        "response" in err &&
+        err.response &&
+        typeof err.response === "object" &&
+        "data" in err.response &&
+        err.response.data &&
+        typeof err.response.data === "object" &&
+        "message" in err.response.data
+      ) {
+        const message =
+          (err.response.data as { message?: string }).message || "Login failed";
+        setFormError(message);
+      } else {
+        setFormError("Login failed");
+      }
+    },
+    onSuccess: (data) => {
+      if (data.token) {
+        localStorage.setItem("authToken", data.token);
+      }
+      setUser(data);
+      toast.success("Login successful!");
+      navigate("/dashboard"); // Change to your post-login route
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormError("");
+    mutate({ identifier, password });
+  };
+
   return (
     <Box
       display="flex"
@@ -49,7 +103,12 @@ function Login() {
         <Typography variant="body2" align="center" color="text.primary" mb={3}>
           Welcome back to Notely
         </Typography>
-        <Box component="form" noValidate>
+        <Box component="form" onSubmit={handleSubmit} noValidate>
+          {formError && (
+            <Typography color="error" fontSize={14} textAlign="center">
+              {formError}
+            </Typography>
+          )}
           <Typography variant="subtitle2" mb={0.5} color="text.primary">
             Email or Username
           </Typography>
@@ -58,6 +117,8 @@ function Login() {
             margin="dense"
             placeholder="Enter your email address or username"
             required
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -75,6 +136,8 @@ function Login() {
             placeholder="Enter your password"
             type={showPassword ? "text" : "password"}
             required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -121,8 +184,10 @@ function Login() {
             variant="contained"
             size="large"
             sx={{ mt: 3, mb: 2 }}
+            type="submit"
+            disabled={isPending}
           >
-            Sign In
+            {isPending ? "Signing In..." : "Sign In"}
           </Button>
           <Box display="flex" alignItems="center" mb={2}>
             <Box flex={1} height={1} bgcolor="#e0e0e0" />
@@ -148,6 +213,7 @@ function Login() {
             </Link>
           </Box>
         </Box>
+        {/* Remove the logout button from Login page */}
       </Paper>
     </Box>
   );

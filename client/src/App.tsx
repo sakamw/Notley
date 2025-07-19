@@ -6,6 +6,8 @@ import ForgotPassword from "./pages/auth/ForgotPassword";
 import Header from "./pages/Header";
 import Footer from "./components/common/Footer";
 import LandingPage from "./pages/LandingPage";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const theme = createTheme({
   palette: {
@@ -24,12 +26,26 @@ const theme = createTheme({
   typography: {
     fontFamily: '"Times New Roman", serif',
   },
+  components: {
+    MuiInputBase: {
+      styleOverrides: {
+        input: {
+          color: "#191b2b", // input text color (dark grey)
+          "&::placeholder": {
+            color: "#a0a0a0", // placeholder color (light grey)
+            opacity: 1,
+          },
+        },
+      },
+    },
+  },
 });
 
 function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      <ToastContainer position="top-center" />
       <BrowserRouter>
         <Header />
         <Routes>

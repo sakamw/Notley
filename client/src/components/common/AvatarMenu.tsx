@@ -8,7 +8,10 @@ import {
 import { useState, useRef } from "react";
 import { useAuth } from "../../store/useStore";
 import { useNavigate } from "react-router-dom";
-import { uploadImageToCloudinary } from "../../utils/uploads";
+import {
+  uploadImageToCloudinary,
+  updateUserAvatarUrl,
+} from "../../utils/uploads";
 import Snackbar from "@mui/material/Snackbar";
 
 const AvatarMenu = () => {
@@ -39,10 +42,9 @@ const AvatarMenu = () => {
     setUploading(true);
     try {
       const url = await uploadImageToCloudinary(file);
-      setUser({
-        ...user!,
-        avatar: url,
-      });
+      // Persist avatar to backend
+      const updatedUser = await updateUserAvatarUrl(url);
+      setUser(updatedUser);
       setSnackbarOpen(true);
     } catch (err) {
       console.error(err);

@@ -11,10 +11,10 @@ cloudinary.v2.config({
 
 export const getCurrentUser = async (
   req: AuthRequest,
-  res: Response,
+  res: Response
 ): Promise<void> => {
   try {
-    const userId = req.user?.id;
+    const userId = String(req.user?.id);
     if (!userId) {
       res.status(401).json({ message: "Unauthorized." });
       return;
@@ -41,7 +41,7 @@ export const getCurrentUser = async (
 
 export const updateUserInfo = async (req: AuthRequest, res: Response) => {
   try {
-    const userId = req.user?.id;
+    const userId = String(req.user?.id);
     if (!userId) {
       res.status(401).json({ message: "Unauthorized." });
       return;
@@ -94,7 +94,7 @@ export const updateUserInfo = async (req: AuthRequest, res: Response) => {
 
 export const getUserBlogs = async (req: AuthRequest, res: Response) => {
   try {
-    const userId = req.user?.id;
+    const userId = String(req.user?.id);
     if (!userId) {
       res.status(401).json({ message: "Unauthorized." });
       return;
@@ -124,7 +124,7 @@ export const getUserBlogs = async (req: AuthRequest, res: Response) => {
 
 export const uploadUserAvatar = async (req: AuthRequest, res: Response) => {
   try {
-    const userId = req.user?.id;
+    const userId = String(req.user?.id);
     if (!userId) {
       res.status(401).json({ message: "Unauthorized." });
       return;
@@ -167,7 +167,7 @@ export const uploadUserAvatar = async (req: AuthRequest, res: Response) => {
           (error, result) => {
             if (error) return reject(error);
             resolve(result);
-          },
+          }
         )
         .end(req.file!.buffer);
     });
@@ -201,7 +201,7 @@ export const uploadUserAvatar = async (req: AuthRequest, res: Response) => {
 
 export const updateUserAvatarUrl = async (req: AuthRequest, res: Response) => {
   try {
-    const userId = req.user?.id;
+    const userId = String(req.user?.id);
     if (!userId) {
       res.status(401).json({ message: "Unauthorized." });
       return;
@@ -233,7 +233,7 @@ export const updateUserAvatarUrl = async (req: AuthRequest, res: Response) => {
 
 export const deactivateUser = async (req: AuthRequest, res: Response) => {
   try {
-    const userId = req.user?.id;
+    const userId = String(req.user?.id);
     if (!userId) {
       res.status(401).json({ message: "Unauthorized." });
       return;

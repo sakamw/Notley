@@ -106,7 +106,7 @@ export const updateUserPassword = async (req: AuthRequest, res: Response) => {
       return;
     }
     const user = await client.user.findUnique({
-      where: { id: userId },
+      where: { id: String(userId) },
     });
     if (!user) {
       res.status(404).json({ message: "User not found." });
@@ -119,7 +119,7 @@ export const updateUserPassword = async (req: AuthRequest, res: Response) => {
     }
     const hashed = await bcrypt.hash(newPassword, 10);
     await client.user.update({
-      where: { id: userId },
+      where: { id: String(userId) },
       data: { password: hashed },
     });
     res.json({ message: "Password updated successfully." });

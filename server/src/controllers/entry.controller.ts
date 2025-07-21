@@ -6,7 +6,7 @@ const client = new PrismaClient();
 
 export const getUserEntries = async (req: AuthRequest, res: Response) => {
   try {
-    const userId = req.user?.id;
+    const userId = String(req.user?.id);
     if (!userId) return res.status(401).json({ message: "Unauthorized." });
     const { pinned } = req.query;
     const entries = await client.entry.findMany({
@@ -25,7 +25,7 @@ export const getUserEntries = async (req: AuthRequest, res: Response) => {
 
 export const getEntryById = async (req: AuthRequest, res: Response) => {
   try {
-    const userId = req.user?.id;
+    const userId = String(req.user?.id);
     const { id } = req.params;
     const entry = await client.entry.findFirst({
       where: { id, authorId: userId, isDeleted: false },
@@ -39,7 +39,7 @@ export const getEntryById = async (req: AuthRequest, res: Response) => {
 
 export const createEntry = async (req: AuthRequest, res: Response) => {
   try {
-    const userId = req.user?.id;
+    const userId = String(req.user?.id);
     if (!userId) return res.status(401).json({ message: "Unauthorized." });
     const { title, synopsis, content, categoryId, isPublic, tags } = req.body;
     if (!title || !content) {
@@ -65,7 +65,7 @@ export const createEntry = async (req: AuthRequest, res: Response) => {
 
 export const updateEntry = async (req: AuthRequest, res: Response) => {
   try {
-    const userId = req.user?.id;
+    const userId = String(req.user?.id);
     const { id } = req.params;
     const { title, synopsis, content, isDeleted, categoryId, isPublic, tags } =
       req.body;
@@ -93,7 +93,7 @@ export const updateEntry = async (req: AuthRequest, res: Response) => {
 
 export const deleteEntry = async (req: AuthRequest, res: Response) => {
   try {
-    const userId = req.user?.id;
+    const userId = String(req.user?.id);
     const { id } = req.params;
     const entry = await client.entry.findFirst({
       where: { id, authorId: userId, isDeleted: false },
@@ -108,7 +108,7 @@ export const deleteEntry = async (req: AuthRequest, res: Response) => {
 
 export const searchEntries = async (req: AuthRequest, res: Response) => {
   try {
-    const userId = req.user?.id;
+    const userId = String(req.user?.id);
     if (!userId) return res.status(401).json({ message: "Unauthorized." });
     const { q } = req.query;
     if (!q || typeof q !== "string") {
@@ -146,7 +146,7 @@ export const getPublicEntries = async (_req: any, res: Response) => {
 
 export const getTrashedEntries = async (req: AuthRequest, res: Response) => {
   try {
-    const userId = req.user?.id;
+    const userId = String(req.user?.id);
     if (!userId) return res.status(401).json({ message: "Unauthorized." });
     const entries = await client.entry.findMany({
       where: { authorId: userId, isDeleted: true },
@@ -160,7 +160,7 @@ export const getTrashedEntries = async (req: AuthRequest, res: Response) => {
 
 export const restoreEntry = async (req: AuthRequest, res: Response) => {
   try {
-    const userId = req.user?.id;
+    const userId = String(req.user?.id);
     const { id } = req.params;
     const entry = await client.entry.findFirst({
       where: { id, authorId: userId, isDeleted: true },
@@ -179,10 +179,10 @@ export const restoreEntry = async (req: AuthRequest, res: Response) => {
 
 export const permanentlyDeleteEntry = async (
   req: AuthRequest,
-  res: Response,
+  res: Response
 ) => {
   try {
-    const userId = req.user?.id;
+    const userId = String(req.user?.id);
     const { id } = req.params;
     const entry = await client.entry.findFirst({
       where: { id, authorId: userId, isDeleted: true },
@@ -198,7 +198,7 @@ export const permanentlyDeleteEntry = async (
 
 export const pinEntry = async (req: AuthRequest, res: Response) => {
   try {
-    const userId = req.user?.id;
+    const userId = String(req.user?.id);
     const { id } = req.params;
     const { pinned } = req.body;
     const entry = await client.entry.findFirst({

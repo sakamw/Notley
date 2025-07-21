@@ -14,10 +14,13 @@ dotenv.config();
 app.use(express.json());
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: [
+      "http://localhost:5173",
+      "https://s5kw9q5f-5173.uks1.devtunnels.ms",
+    ],
     credentials: true,
     methods: ["POST", "GET", "PUT", "PATCH", "DELETE"],
-  }),
+  })
 );
 
 app.use(cookieParser());

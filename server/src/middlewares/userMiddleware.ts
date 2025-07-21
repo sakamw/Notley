@@ -1,17 +1,19 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import multer from "multer";
+import { Express } from "express";
 
 export const avatarUpload = multer({ storage: multer.memoryStorage() });
 
 export interface AuthRequest extends Request {
-  user?: { id: string };
+  user?: { id: number };
+  file?: Express.Multer.File;
 }
 
 export async function authenticateJWT(
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) {
   const token =
     req.cookies?.authToken ||

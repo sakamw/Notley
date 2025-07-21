@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:4800/api",
+  baseURL: "https://notely-server-production.up.railway.app/api",
   withCredentials: true,
 });
 
@@ -15,7 +15,7 @@ axiosInstance.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  },
+  }
 );
 
 export default axiosInstance;

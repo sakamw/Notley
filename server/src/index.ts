@@ -20,6 +20,7 @@ app.use(
     ],
     credentials: true,
     methods: ["POST", "GET", "PUT", "PATCH", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
@@ -33,6 +34,6 @@ app.get("/", (_req, res) => {
   res.send("<h1>Welcome to Notely</h1>");
 });
 
-const port = process.env.PORT || 4800;
+const port = process.env.PORT || 4801;
 console.log(`App running on port ${port}`);
 app.listen(port);

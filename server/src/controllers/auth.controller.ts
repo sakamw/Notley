@@ -69,7 +69,16 @@ export const login = async (req: Request, res: Response) => {
     }
 
     const token = jwt.sign(userDetails, process.env.JWT_SECRET);
-    res.cookie("authToken", token).json({ ...userDetails });
+    // Set cookie options based on environment
+    const isProduction = process.env.NODE_ENV === "production";
+    res
+      .cookie("authToken", token, {
+        httpOnly: true,
+        secure: isProduction, // true in production, false in dev
+        sameSite: isProduction ? "none" : "lax",
+        path: "/",
+      })
+      .json({ ...userDetails });
   } catch (error) {
     res.status(500).json({ message: "Server error during login." });
   }

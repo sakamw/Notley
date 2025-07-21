@@ -20,15 +20,8 @@ model User {
   isDeleted  Boolean  @default(false) @map("is_deleted")
 
   entries Entry[]
-  activityLogs ActivityLog[]
 
   @@map("user")
-}
-
-model Category {
-  id    String  @id @default(uuid())
-  name  String  @unique
-  entries Entry[]
 }
 
 model Entry {
@@ -36,7 +29,9 @@ model Entry {
   title         String   @map("title")
   synopsis      String   @map("entry_synopsis")
   content       String   @map("content")
+  tags          String[]
   isDeleted     Boolean  @default(false) @map("is_deleted")
+  pinned        Boolean  @default(false)
   isPublic      Boolean  @default(false)
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
@@ -44,20 +39,5 @@ model Entry {
   authorId   String
   author     User   @relation(fields: [authorId], references: [id])
 
-  categoryId String?
-  category   Category? @relation(fields: [categoryId], references: [id])
-  activityLogs ActivityLog[]
-
   @@map("entry")
-}
-
-model ActivityLog {
-  id        String   @id @default(uuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  entryId   String?
-  entry     Entry?   @relation(fields: [entryId], references: [id])
-  action    String
-  details   String?
-  createdAt DateTime @default(now())
 }

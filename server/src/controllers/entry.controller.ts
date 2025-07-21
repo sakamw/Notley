@@ -4,35 +4,18 @@ import { AuthRequest } from "../middlewares/userMiddleware";
 
 const client = new PrismaClient();
 
-// Helper to log activity
-async function logActivity({
-  userId,
-  entryId,
-  action,
-  details,
-}: {
-  userId: string;
-  entryId?: string;
-  action: string;
-  details?: string;
-}) {
-  await client.activityLog.create({
-    data: {
-      userId,
-      entryId: entryId || undefined,
-      action,
-      details: details || undefined,
-    },
-  });
-}
-
 export const getUserEntries = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.id;
     if (!userId) return res.status(401).json({ message: "Unauthorized." });
+    const { pinned } = req.query;
     const entries = await client.entry.findMany({
-      where: { authorId: userId, isDeleted: false },
-      orderBy: { createdAt: "desc" },
+      where: {
+        authorId: userId,
+        isDeleted: false,
+        ...(pinned !== undefined ? { pinned: pinned === "true" } : {}),
+      },
+      orderBy: [{ pinned: "desc" }, { createdAt: "desc" }],
     });
     res.json(entries);
   } catch (e) {
@@ -58,7 +41,7 @@ export const createEntry = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.id;
     if (!userId) return res.status(401).json({ message: "Unauthorized." });
-    const { title, synopsis, content, categoryId, isPublic } = req.body;
+    const { title, synopsis, content, categoryId, isPublic, tags } = req.body;
     if (!title || !content) {
       return res
         .status(400)
@@ -69,15 +52,10 @@ export const createEntry = async (req: AuthRequest, res: Response) => {
         title,
         synopsis: synopsis || "",
         content,
+        tags: tags || [],
         authorId: userId,
-        categoryId: categoryId || null,
         isPublic: isPublic === true,
       },
-    });
-    await logActivity({
-      userId: userId as string,
-      entryId: entry.id,
-      action: "create",
     });
     res.status(201).json(entry);
   } catch (e) {
@@ -89,7 +67,7 @@ export const updateEntry = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.id;
     const { id } = req.params;
-    const { title, synopsis, content, isDeleted, categoryId, isPublic } =
+    const { title, synopsis, content, isDeleted, categoryId, isPublic, tags } =
       req.body;
     const entry = await client.entry.findFirst({
       where: { id, authorId: userId, isDeleted: false },
@@ -102,14 +80,10 @@ export const updateEntry = async (req: AuthRequest, res: Response) => {
     if (isDeleted !== undefined) updateData.isDeleted = isDeleted;
     if (categoryId !== undefined) updateData.categoryId = categoryId;
     if (isPublic !== undefined) updateData.isPublic = isPublic === true;
+    if (tags !== undefined) updateData.tags = tags;
     const updated = await client.entry.update({
       where: { id },
       data: updateData,
-    });
-    await logActivity({
-      userId: userId as string,
-      entryId: id,
-      action: "update",
     });
     res.json(updated);
   } catch (e) {
@@ -126,11 +100,6 @@ export const deleteEntry = async (req: AuthRequest, res: Response) => {
     });
     if (!entry) return res.status(404).json({ message: "Entry not found." });
     await client.entry.update({ where: { id }, data: { isDeleted: true } });
-    await logActivity({
-      userId: userId as string,
-      entryId: id,
-      action: "delete",
-    });
     res.json({ message: "Entry deleted." });
   } catch (e) {
     res.status(500).json({ message: "Failed to delete entry." });
@@ -163,32 +132,6 @@ export const searchEntries = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export const getCategories = async (_req: AuthRequest, res: Response) => {
-  try {
-    const categories = await client.category.findMany({
-      orderBy: { name: "asc" },
-    });
-    res.json(categories);
-  } catch (e) {
-    res.status(500).json({ message: "Failed to fetch categories." });
-  }
-};
-
-export const createCategory = async (req: AuthRequest, res: Response) => {
-  try {
-    const { name } = req.body;
-    if (!name)
-      return res.status(400).json({ message: "Category name is required." });
-    const category = await client.category.create({ data: { name } });
-    res.status(201).json(category);
-  } catch (e: any) {
-    if (e.code === "P2002") {
-      return res.status(400).json({ message: "Category name must be unique." });
-    }
-    res.status(500).json({ message: "Failed to create category." });
-  }
-};
-
 export const getPublicEntries = async (_req: any, res: Response) => {
   try {
     const entries = await client.entry.findMany({
@@ -198,22 +141,6 @@ export const getPublicEntries = async (_req: any, res: Response) => {
     res.json(entries);
   } catch (e) {
     res.status(500).json({ message: "Failed to fetch public entries." });
-  }
-};
-
-export const getPublicEntryById = async (req: any, res: Response) => {
-  try {
-    const { id } = req.params;
-    const entry = await client.entry.findFirst({
-      where: { id, isPublic: true, isDeleted: false },
-    });
-    if (!entry)
-      return res
-        .status(404)
-        .json({ message: "Entry not found or not public." });
-    res.json(entry);
-  } catch (e) {
-    res.status(500).json({ message: "Failed to fetch public entry." });
   }
 };
 
@@ -244,11 +171,6 @@ export const restoreEntry = async (req: AuthRequest, res: Response) => {
       where: { id },
       data: { isDeleted: false },
     });
-    await logActivity({
-      userId: userId as string,
-      entryId: id,
-      action: "restore",
-    });
     res.json(restored);
   } catch (e) {
     res.status(500).json({ message: "Failed to restore entry." });
@@ -257,7 +179,7 @@ export const restoreEntry = async (req: AuthRequest, res: Response) => {
 
 export const permanentlyDeleteEntry = async (
   req: AuthRequest,
-  res: Response
+  res: Response,
 ) => {
   try {
     const userId = req.user?.id;
@@ -268,44 +190,27 @@ export const permanentlyDeleteEntry = async (
     if (!entry)
       return res.status(404).json({ message: "Entry not found in trash." });
     await client.entry.delete({ where: { id } });
-    await logActivity({
-      userId: userId as string,
-      entryId: id,
-      action: "permanent_delete",
-    });
     res.json({ message: "Entry permanently deleted." });
   } catch (e) {
     res.status(500).json({ message: "Failed to permanently delete entry." });
   }
 };
 
-export const getUserActivityLogs = async (req: AuthRequest, res: Response) => {
+export const pinEntry = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.id;
-    if (!userId) return res.status(401).json({ message: "Unauthorized." });
-    const logs = await client.activityLog.findMany({
-      where: { userId: userId as string },
-      orderBy: { createdAt: "desc" },
-      include: { entry: true },
+    const { id } = req.params;
+    const { pinned } = req.body;
+    const entry = await client.entry.findFirst({
+      where: { id, authorId: userId, isDeleted: false },
     });
-    res.json(logs);
-  } catch (e) {
-    res.status(500).json({ message: "Failed to fetch activity logs." });
-  }
-};
-
-export const getEntryActivityLogs = async (req: AuthRequest, res: Response) => {
-  try {
-    const userId = req.user?.id;
-    const { entryId } = req.params;
-    if (!userId) return res.status(401).json({ message: "Unauthorized." });
-    if (!entryId) return res.status(400).json({ message: "Missing entryId." });
-    const logs = await client.activityLog.findMany({
-      where: { userId: userId as string, entryId },
-      orderBy: { createdAt: "desc" },
+    if (!entry) return res.status(404).json({ message: "Entry not found." });
+    const updated = await client.entry.update({
+      where: { id },
+      data: { pinned: !!pinned },
     });
-    res.json(logs);
+    res.json(updated);
   } catch (e) {
-    res.status(500).json({ message: "Failed to fetch entry activity logs." });
+    res.status(500).json({ message: "Failed to pin/unpin entry." });
   }
 };

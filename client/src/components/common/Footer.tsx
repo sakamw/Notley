@@ -97,46 +97,6 @@ function Footer() {
               </Link>
             </Stack>
           </Box>
-          {/* Support Links */}
-          <Box flex={1}>
-            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-              Support
-            </Typography>
-            <Stack spacing={1}>
-              <Link
-                href="#"
-                color="text.secondary"
-                underline="hover"
-                variant="body2"
-              >
-                Help Center
-              </Link>
-              <Link
-                href="#"
-                color="text.secondary"
-                underline="hover"
-                variant="body2"
-              >
-                Privacy Policy
-              </Link>
-              <Link
-                href="#"
-                color="text.secondary"
-                underline="hover"
-                variant="body2"
-              >
-                Terms of Service
-              </Link>
-              <Link
-                href="#"
-                color="text.secondary"
-                underline="hover"
-                variant="body2"
-              >
-                Security
-              </Link>
-            </Stack>
-          </Box>
         </Stack>
         <Divider sx={{ my: 4 }} />
         <Box textAlign="center">

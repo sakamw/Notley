@@ -11,7 +11,7 @@ cloudinary.v2.config({
 
 export const getCurrentUser = async (
   req: AuthRequest,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     const userId = req.user?.id;
@@ -167,7 +167,7 @@ export const uploadUserAvatar = async (req: AuthRequest, res: Response) => {
           (error, result) => {
             if (error) return reject(error);
             resolve(result);
-          }
+          },
         )
         .end(req.file!.buffer);
     });

@@ -17,7 +17,7 @@ app.use(
     origin: ["http://localhost:5173"],
     credentials: true,
     methods: ["POST", "GET", "PUT", "PATCH", "DELETE"],
-  })
+  }),
 );
 
 app.use(cookieParser());
@@ -31,4 +31,5 @@ app.get("/", (_req, res) => {
 });
 
 const port = process.env.PORT || 4800;
-app.listen(port, () => console.log(`Server running on port ${port}`));
+console.log(`App running on port ${port}`);
+app.listen(port);

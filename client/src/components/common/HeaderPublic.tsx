@@ -48,8 +48,18 @@ function HeaderPublic() {
           color="text.primary"
           component={RouterLink}
           to="/"
-          sx={{ textDecoration: "none" }}
+          sx={{
+            textDecoration: "none",
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+          }}
         >
+          <img
+            src="/logo.jpg"
+            alt="Logo"
+            style={{ height: 28, marginRight: 8, verticalAlign: "middle" }}
+          />
           NOTELY
         </Typography>
         {/* Navigation Links */}

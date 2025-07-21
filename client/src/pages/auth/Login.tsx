@@ -63,7 +63,7 @@ function Login() {
       }
       setUser(data);
       toast.success("Login successful!");
-      navigate("/dashboard"); // Change to your post-login route
+      navigate("/dashboard");
     },
   });
 
@@ -213,7 +213,6 @@ function Login() {
             </Link>
           </Box>
         </Box>
-        {/* Remove the logout button from Login page */}
       </Paper>
     </Box>
   );

@@ -60,7 +60,7 @@ const Signup = () => {
         ) {
           throw new Error(
             (err.response.data as { message?: string }).message ||
-              "Signup failed"
+              "Signup failed",
           );
         } else {
           throw new Error("Signup failed");

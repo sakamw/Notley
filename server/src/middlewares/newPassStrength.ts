@@ -4,7 +4,7 @@ import zxcvbn from "zxcvbn";
 export async function verifyNewPassStrength(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const { newPassword } = req.body;
 

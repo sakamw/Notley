@@ -7,7 +7,7 @@ const client = new PrismaClient();
 export async function verifyUserInfo(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const { firstName, lastName, username, email, password } = req.body;
 
@@ -21,7 +21,7 @@ export async function verifyUserInfo(
 export async function checkEmailAndUsernameReuse(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const { username, email } = req.body;
   const existingUser = await client.user.findFirst({
@@ -40,7 +40,7 @@ export async function checkEmailAndUsernameReuse(
 export async function verifyPassStrength(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const { password } = req.body;
   const result = zxcvbn(password);

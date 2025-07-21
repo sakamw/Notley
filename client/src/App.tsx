@@ -8,6 +8,17 @@ import Footer from "./components/common/Footer";
 import LandingPage from "./pages/LandingPage";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import NewNote from "./pages/entries/NewNote";
+import EditNotes from "./pages/entries/EditNotes";
+import EditNote from "./pages/entries/EditNote";
+import { useAuth } from "./store/useStore";
+import { useLocation } from "react-router-dom";
+import Dashboard from "./pages/Dashboard";
+import Trash from "./pages/Trash";
+import Bookmarks from "./pages/Bookmarks";
+import Drafts from "./pages/Drafts";
+import TagNotes from "./pages/TagNotes";
+import NoteView from "./pages/entries/NoteView";
 
 const theme = createTheme({
   palette: {
@@ -30,9 +41,9 @@ const theme = createTheme({
     MuiInputBase: {
       styleOverrides: {
         input: {
-          color: "#191b2b", // input text color (dark grey)
+          color: "#191b2b",
           "&::placeholder": {
-            color: "#a0a0a0", // placeholder color (light grey)
+            color: "#a0a0a0",
             opacity: 1,
           },
         },
@@ -47,16 +58,36 @@ function App() {
       <CssBaseline />
       <ToastContainer position="top-center" />
       <BrowserRouter>
-        <Header />
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-        </Routes>
-        <Footer />
+        <AppContent />
       </BrowserRouter>
     </ThemeProvider>
+  );
+}
+
+function AppContent() {
+  const { isAuthenticated } = useAuth();
+  const location = useLocation();
+  return (
+    <>
+      <Header />
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/trash" element={<Trash />} />
+        <Route path="/bookmarks" element={<Bookmarks />} />
+        <Route path="/drafts" element={<Drafts />} />
+        <Route path="/tags/:tag" element={<TagNotes />} />
+        <Route path="/notes/new" element={<NewNote />} />
+        <Route path="/edit-notes" element={<EditNotes />} />
+        <Route path="/edit-note/:id" element={<EditNote />} />
+        <Route path="/note/:id" element={<NoteView />} />
+      </Routes>
+      {!isAuthenticated &&
+        !["/login", "/signup"].includes(location.pathname) && <Footer />}
+    </>
   );
 }
 

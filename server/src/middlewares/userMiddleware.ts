@@ -11,7 +11,7 @@ export interface AuthRequest extends Request {
 export async function authenticateJWT(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const token =
     req.cookies?.authToken ||
@@ -31,7 +31,6 @@ export async function authenticateJWT(
     (req as any).user = { id: (decoded as any).id };
     next();
   } catch (e) {
-    console.log("Auth middleware - user set:", e);
     res.status(401).json({ message: "Invalid or expired token." });
     return;
   }

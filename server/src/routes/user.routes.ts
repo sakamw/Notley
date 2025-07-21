@@ -18,7 +18,7 @@ router.patch(
   "/avatar",
   authenticateJWT,
   avatarUpload.single("avatar"),
-  uploadUserAvatar
+  uploadUserAvatar,
 );
 router.patch("/avatar-url", authenticateJWT, updateUserAvatarUrl);
 router.patch("/deactivate", authenticateJWT, deactivateUser);

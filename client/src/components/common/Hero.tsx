@@ -1,5 +1,5 @@
 import { Box, Typography, Button, Container } from "@mui/material";
-import { Description, ArrowForward } from "@mui/icons-material";
+import { ArrowForward } from "@mui/icons-material";
 import { Link as RouterLink } from "react-router-dom";
 
 function Hero() {
@@ -16,52 +16,50 @@ function Hero() {
       <Box
         sx={{
           width: "100%",
-          textAlign: "center",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
+          minHeight: { xs: 360, md: 420 },
+          pt: { xs: 6, md: 8 },
         }}
       >
-        <Box
-          sx={{
-            p: 1.5,
-            bgcolor: "primary.main",
-            color: "primary.contrastText",
-            borderRadius: "50%",
-            mb: 3,
-            display: "inline-flex",
+        <img
+          src="/logo.png"
+          alt="Notely Logo"
+          style={{
+            width: 180,
+            height: 180,
+            objectFit: "contain",
+            borderRadius: 16,
+            marginBottom: 32,
+            maxWidth: "100%",
           }}
-        >
-          <Description sx={{ fontSize: 32 }} />
-        </Box>
+        />
         <Typography
-          variant="h1"
-          component="h1"
+          variant="h2"
           sx={{
-            mb: 3,
-            maxWidth: "50em",
-            fontSize: { xs: "2.5rem", md: "3.5rem" },
-            fontWeight: 600,
-            lineHeight: 1.2,
+            fontWeight: 800,
+            fontSize: { xs: "2rem", sm: "2.5rem", md: "3.5rem", lg: "4rem" },
+            mb: 2,
+            lineHeight: 1.15,
+            textAlign: "center",
           }}
         >
-          Capture Your Ideas, Organize Your Thoughts
+          Notely helps you to easily and efficiently organize your notes
         </Typography>
         <Typography
-          variant="h6"
-          component="p"
+          variant="subtitle1"
           sx={{
-            mb: 4,
-            maxWidth: "600px",
-            color: "#444444",
-            fontSize: "1.1rem",
-            fontWeight: 400,
+            fontSize: { xs: "1rem", sm: "1.15rem", md: "1.25rem" },
+            mb: 3,
+            color: "text.secondary",
+            maxWidth: 600,
+            textAlign: "center",
           }}
         >
-          The intelligent note-taking app that helps you capture, organize, and
-          find your ideas instantly. Perfect for students, professionals, and
-          creative minds.
+          Jot down your thoughts, ideas, and tasks in one place. Enjoy markdown
+          support, live preview, and easy publishing.
         </Typography>
         <Box
           sx={{
@@ -69,6 +67,7 @@ function Hero() {
             flexDirection: { xs: "column", sm: "row" },
             gap: 2,
             mb: 2,
+            justifyContent: "center",
           }}
         >
           <Button
@@ -79,7 +78,7 @@ function Hero() {
             endIcon={<ArrowForward />}
             sx={{ px: 4, py: 1.5 }}
           >
-            Get Started Free
+            Get Started
           </Button>
         </Box>
       </Box>

@@ -11,16 +11,43 @@ export const register = async (req: Request, res: Response) => {
   try {
     const { firstName, lastName, email, username, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
-    await client.user.create({
+    const user = await client.user.create({
       data: {
         firstName,
         lastName,
         email,
         username,
         password: hashedPassword,
+        verified: false,
       },
     });
-    res.status(201).json({ message: "User created successfully." });
+    if (!process.env.JWT_SECRET) {
+      return res.status(500).json({ message: "Server configuration error." });
+    }
+    const activationToken = jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+    const activationLink = `${frontendUrl}/activate/${user.id}/${activationToken}`;
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: user.email,
+      subject: "Activate Your Account",
+      html: `<p>Welcome! Please <a href="${activationLink}">activate your account</a> to start using Notely. This link will expire in 24 hours.</p>`,
+    });
+    res.status(201).json({
+      message:
+        "Registration successful! Please check your email to activate your account.",
+    });
   } catch (e: any) {
     if (e.code === "P2002") {
       res.status(400).json({ message: "Email or username already in use." });
@@ -29,6 +56,41 @@ export const register = async (req: Request, res: Response) => {
     const message = e.message || "Something went wrong.";
     console.error(e);
     res.status(500).json({ message });
+  }
+};
+
+export const activateAccount = async (req: Request, res: Response) => {
+  const { id, token } = req.params;
+  try {
+    const user = await client.user.findUnique({ where: { id } });
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+    if (user.verified) {
+      return res.status(400).json({ message: "Account already activated." });
+    }
+    if (!process.env.JWT_SECRET) {
+      return res.status(500).json({ message: "Server configuration error." });
+    }
+    try {
+      const payload = jwt.verify(token, process.env.JWT_SECRET) as {
+        id: string;
+        email: string;
+      };
+      if (payload.id !== user.id || payload.email !== user.email) {
+        return res.status(400).json({ message: "Invalid activation token." });
+      }
+      await client.user.update({ where: { id }, data: { verified: true } });
+      // Redirect to login page with success param
+      const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+      return res.redirect(`${frontendUrl}/login?activated=1`);
+    } catch (error) {
+      return res
+        .status(400)
+        .json({ message: "Invalid or expired activation link." });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: "Error activating account." });
   }
 };
 
@@ -54,6 +116,13 @@ export const login = async (req: Request, res: Response) => {
       res.status(400).json({ message: "Invalid credentials." });
       return;
     }
+    if (!user.verified) {
+      res.status(403).json({
+        message:
+          "Account not activated. Please check your email for the activation link.",
+      });
+      return;
+    }
 
     const isPassMatch = await bcrypt.compare(password, user.password);
     if (!isPassMatch) {
@@ -74,7 +143,7 @@ export const login = async (req: Request, res: Response) => {
     res
       .cookie("authToken", token, {
         httpOnly: true,
-        secure: isProduction, // true in production, false in dev
+        secure: isProduction,
         sameSite: isProduction ? "none" : "lax",
         path: "/",
       })
@@ -153,7 +222,9 @@ export const forgotPassword = async (req: Request, res: Response) => {
     const token = jwt.sign({ email: oldUser.email, id: oldUser.id }, secret, {
       expiresIn: "5m",
     });
-    const link = `https://notely-server-production.up.railway.app/api/auth/reset-password/${oldUser.id}/${token}`;
+
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+    const link = `${frontendUrl}/reset-password/${oldUser.id}/${token}`;
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -228,5 +299,48 @@ export const resetPassword = async (req: Request, res: Response) => {
     }
   } else {
     return res.status(405).json({ message: "Method not allowed." });
+  }
+};
+
+export const resendActivation = async (req: Request, res: Response) => {
+  const { email } = req.body;
+  try {
+    const user = await client.user.findUnique({ where: { email } });
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+    if (user.verified) {
+      return res.status(400).json({ message: "Account already activated." });
+    }
+    if (!process.env.JWT_SECRET) {
+      return res.status(500).json({ message: "Server configuration error." });
+    }
+    const activationToken = jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+    const activationLink = `${frontendUrl}/activate/${user.id}/${activationToken}`;
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: user.email,
+      subject: "Activate Your Account",
+      html: `<p>Please <a href="${activationLink}">activate your account</a> to start using Notely. This link will expire in 24 hours.</p>`,
+    });
+    return res
+      .status(200)
+      .json({ message: "Activation email resent. Please check your inbox." });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Error resending activation email." });
   }
 };

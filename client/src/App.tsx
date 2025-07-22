@@ -19,6 +19,9 @@ import Bookmarks from "./pages/Bookmarks";
 import Drafts from "./pages/Drafts";
 import TagNotes from "./pages/TagNotes";
 import NoteView from "./pages/entries/NoteView";
+import ResetPassword from "./pages/auth/ResetPassword";
+import ActivateAccount from "./pages/auth/ActivateAccount";
+import ResendActivation from "./pages/auth/ResendActivation";
 
 const theme = createTheme({
   palette: {
@@ -75,6 +78,8 @@ function AppContent() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:id/:token" element={<ResetPassword />} />
+        <Route path="/activate/:id/:token" element={<ActivateAccount />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/trash" element={<Trash />} />
         <Route path="/bookmarks" element={<Bookmarks />} />
@@ -84,9 +89,15 @@ function AppContent() {
         <Route path="/edit-notes" element={<EditNotes />} />
         <Route path="/edit-note/:id" element={<EditNote />} />
         <Route path="/note/:id" element={<NoteView />} />
+        <Route path="/resend-activation" element={<ResendActivation />} />
       </Routes>
       {!isAuthenticated &&
-        !["/login", "/signup"].includes(location.pathname) && <Footer />}
+        ![
+          "/login",
+          "/signup",
+          "/forgot-password",
+          "/activate/:id/:token",
+        ].includes(location.pathname) && <Footer />}
     </>
   );
 }

@@ -11,6 +11,8 @@ import {
   updateUserPassword,
   forgotPassword,
   resetPassword,
+  resendActivation,
+  activateAccount,
 } from "../controllers/auth.controller";
 import { verifyNewPassStrength } from "../middlewares/newPassStrength";
 import { authenticateJWT } from "../middlewares/userMiddleware";
@@ -22,7 +24,7 @@ router.post(
   verifyUserInfo,
   checkEmailAndUsernameReuse,
   verifyPassStrength,
-  register,
+  register
 );
 router.post("/login", login);
 router.post("/logout", logout);
@@ -30,11 +32,13 @@ router.post(
   "/password",
   authenticateJWT,
   verifyNewPassStrength,
-  updateUserPassword,
+  updateUserPassword
 );
 
 router.post("/forgot-password", forgotPassword);
 router.get("/reset-password/:id/:token", resetPassword);
 router.post("/reset-password/:id/:token", resetPassword);
+router.post("/resend-activation", resendActivation);
+router.get("/activate/:id/:token", activateAccount);
 
 export default router;

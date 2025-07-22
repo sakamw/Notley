@@ -15,11 +15,12 @@ import EmailIcon from "@mui/icons-material/Email";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import LockIcon from "@mui/icons-material/Lock";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { Link as RouterLink, useNavigate, useLocation } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import axiosInstance from "../../api/axios";
 import { toast } from "react-toastify";
 import { useAuth } from "../../store/useStore";
+import { useEffect } from "react";
 
 function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -28,6 +29,14 @@ function Login() {
   const [formError, setFormError] = useState("");
   const navigate = useNavigate();
   const { setUser } = useAuth();
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get("activated")) {
+      toast.success("Email activated successfully!");
+    }
+  }, [location]);
 
   const { isPending, mutate } = useMutation({
     mutationKey: ["login-user"],
@@ -107,6 +116,15 @@ function Login() {
           {formError && (
             <Typography color="error" fontSize={14} textAlign="center">
               {formError}
+            </Typography>
+          )}
+          {formError ===
+            "Account not activated. Please check your email for the activation link." && (
+            <Typography color="error" mt={2}>
+              {formError} <br />
+              <RouterLink to="/resend-activation">
+                Resend activation email
+              </RouterLink>
             </Typography>
           )}
           <Typography variant="subtitle2" mb={0.5} color="text.primary">

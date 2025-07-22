@@ -122,7 +122,7 @@ function HeaderLoggedIn() {
             >
               New note
             </Button>
-            <AvatarMenu user={user} />
+            <AvatarMenu />
           </Stack>
         </Toolbar>
       </AppBar>

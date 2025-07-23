@@ -1,5 +1,5 @@
-import { ThemeProvider, createTheme, CssBaseline } from "@mui/material";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { ThemeProvider, CssBaseline } from "@mui/material";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
 import ForgotPassword from "./pages/auth/ForgotPassword";
@@ -12,7 +12,6 @@ import NewNote from "./pages/entries/NewNote";
 import EditNotes from "./pages/entries/EditNotes";
 import EditNote from "./pages/entries/EditNote";
 import { useAuth } from "./store/useStore";
-import { useLocation } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Trash from "./pages/Trash";
 import Bookmarks from "./pages/Bookmarks";
@@ -22,47 +21,60 @@ import NoteView from "./pages/entries/NoteView";
 import ResetPassword from "./pages/auth/ResetPassword";
 import ActivateAccount from "./pages/auth/ActivateAccount";
 import ResendActivation from "./pages/auth/ResendActivation";
+import ProfilePage from "./pages/auth/ProfilePage";
+import { useEffect, useMemo, useState } from "react";
+import {
+  staticLightTheme,
+  getPreferredTheme,
+  createDynamicTheme,
+} from "./types/theme";
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: "#3d82f5",
-    },
-    background: {
-      default: "#f0f6ff",
-      paper: "#fff",
-    },
-    text: {
-      primary: "#191b2b",
-      secondary: "#0172fa",
-    },
-  },
-  typography: {
-    fontFamily: '"Times New Roman", serif',
-  },
-  components: {
-    MuiInputBase: {
-      styleOverrides: {
-        input: {
-          color: "#191b2b",
-          "&::placeholder": {
-            color: "#a0a0a0",
-            opacity: 1,
-          },
-        },
-      },
-    },
-  },
-});
+const THEME_KEY = "notely_theme";
 
-function App() {
+function ThemedAppContent() {
+  const { isAuthenticated } = useAuth();
+  const location = useLocation();
+  const [themeMode, setThemeMode] = useState(getPreferredTheme(THEME_KEY));
+
+  useEffect(() => {
+    const handler = () => setThemeMode(getPreferredTheme(THEME_KEY));
+    window.addEventListener("notely-theme-change", handler);
+    window
+      .matchMedia("(prefers-color-scheme: dark)")
+      .addEventListener("change", handler);
+    return () => {
+      window.removeEventListener("notely-theme-change", handler);
+      window
+        .matchMedia("(prefers-color-scheme: dark)")
+        .removeEventListener("change", handler);
+    };
+  }, []);
+
+  const dynamicTheme = useMemo(
+    () => createDynamicTheme(themeMode),
+    [themeMode]
+  );
+
+  const alwaysLightRoutes = [
+    "/",
+    "/login",
+    "/signup",
+    "/forgot-password",
+    "/resend-activation",
+  ];
+  const isAlwaysLight =
+    alwaysLightRoutes.includes(location.pathname) ||
+    /^\/reset-password\//.test(location.pathname) ||
+    /^\/activate\//.test(location.pathname);
+
+  const theme =
+    !isAlwaysLight && isAuthenticated ? dynamicTheme : staticLightTheme;
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <ToastContainer position="top-center" />
-      <BrowserRouter>
-        <AppContent />
-      </BrowserRouter>
+      <AppContent />
     </ThemeProvider>
   );
 }
@@ -90,6 +102,7 @@ function AppContent() {
         <Route path="/edit-note/:id" element={<EditNote />} />
         <Route path="/note/:id" element={<NoteView />} />
         <Route path="/resend-activation" element={<ResendActivation />} />
+        <Route path="/profile" element={<ProfilePage />} />
       </Routes>
       {!isAuthenticated &&
         ![
@@ -99,6 +112,14 @@ function AppContent() {
           "/activate/:id/:token",
         ].includes(location.pathname) && <Footer />}
     </>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <ThemedAppContent />
+    </BrowserRouter>
   );
 }
 

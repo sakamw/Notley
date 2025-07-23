@@ -88,7 +88,14 @@ const AvatarMenu = () => {
           style={{ display: "none" }}
           onChange={handleFileChange}
         />
-        <MenuItem disabled>Account Setting </MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleClose();
+            navigate("/profile");
+          }}
+        >
+          Account Setting
+        </MenuItem>
         <MenuItem onClick={handleLogout}>Logout </MenuItem>
       </Menu>
       <Snackbar

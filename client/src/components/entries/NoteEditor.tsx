@@ -16,6 +16,7 @@ import {
   DialogActions,
   Menu,
   MenuItem,
+  useTheme,
 } from "@mui/material";
 import {
   Add as AddIcon,
@@ -49,6 +50,12 @@ interface NoteEditorProps {
     content: string;
     tags: string[];
   }) => void;
+  onCancel?: (data: {
+    title: string;
+    synopsis: string;
+    content: string;
+    tags: string[];
+  }) => void;
   onPublish?: () => void;
   loading?: boolean;
   sidebarWidth?: number;
@@ -62,6 +69,7 @@ const NoteEditor = ({
   initialTags = [],
   onSave,
   onDelete,
+  onCancel,
   onPublish,
   loading = false,
   sidebarWidth = 220,
@@ -78,6 +86,7 @@ const NoteEditor = ({
   const { user } = useAuth();
   const { addPublicNote } = usePublicNotes();
   const { addBookmark, removeBookmark, isBookmarked } = useBookmarks();
+  const theme = useTheme();
 
   useEffect(() => {
     setTitle(initialTitle);
@@ -123,15 +132,17 @@ const NoteEditor = ({
         bgcolor: "background.default",
         p: 0,
         gap: { xs: 2, md: 2 },
-        mt: { xs: "56px", md: "56px" },
+        mt: { xs: "80px", md: "72px" },
         ml: { xs: 0, sm: `calc(${sidebarWidth}px + 16px)` },
         transition: "margin-left 0.2s cubic-bezier(.4,0,.2,1)",
         position: "relative",
-        maxWidth: "100%",
+        maxWidth: "100vw",
         overflow: "hidden",
         boxSizing: "border-box",
         alignItems: { md: "center" },
         justifyContent: { md: "center" },
+        width: "100vw",
+        px: { xs: 0.5, sm: 2, md: 0 },
       }}
     >
       {/* Top-right menu bar */}
@@ -139,19 +150,19 @@ const NoteEditor = ({
         elevation={4}
         sx={{
           flex: 1,
-          p: { xs: 2, sm: 3 },
+          p: { xs: 1, sm: 2, md: 3 },
           display: "flex",
           flexDirection: "column",
           gap: 2,
           minWidth: 0,
           width: { xs: "100%", md: "100%" },
-          maxWidth: { md: "700px" },
+          maxWidth: { xs: "100vw", md: "700px" },
           height: { xs: "auto", md: "80vh" },
           boxSizing: "border-box",
           overflow: "auto",
           borderRadius: 3,
           boxShadow: "0 2px 16px 0 rgba(0,0,0,0.08)",
-          background: "#fff",
+          background: theme.palette.background.paper,
           justifyContent: "flex-start",
         }}
       >
@@ -280,14 +291,29 @@ const NoteEditor = ({
           placeholder="untitled note"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          sx={{ fontSize: 24, fontWeight: 600, mb: 1, color: "text.primary" }}
+          sx={{
+            fontSize: 24,
+            fontWeight: 600,
+            mb: 1,
+            color: theme.palette.text.primary,
+            backgroundColor: "transparent",
+            borderRadius: 0,
+            px: 1,
+          }}
           fullWidth
         />
         <InputBase
           placeholder="Add a synopsis (short summary for preview)"
           value={synopsis}
           onChange={(e) => setSynopsis(e.target.value)}
-          sx={{ fontSize: 16, mb: 2, color: "text.secondary" }}
+          sx={{
+            fontSize: 16,
+            mb: 2,
+            color: theme.palette.text.primary,
+            backgroundColor: "transparent",
+            borderRadius: 0,
+            px: 1,
+          }}
           fullWidth
         />
         <Box>
@@ -311,7 +337,14 @@ const NoteEditor = ({
               value={tagInput}
               onChange={(e) => setTagInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              sx={{ fontSize: 14, minWidth: 80, color: "primary.main" }}
+              sx={{
+                fontSize: 14,
+                minWidth: 80,
+                color: theme.palette.text.primary,
+                backgroundColor: "transparent",
+                borderRadius: 0,
+                px: 1,
+              }}
               inputProps={{ "aria-label": "add a tag" }}
             />
             <IconButton
@@ -331,7 +364,22 @@ const NoteEditor = ({
           value={content}
           onChange={(e) => setContent(e.target.value)}
           variant="outlined"
-          sx={{ fontFamily: "monospace", bgcolor: "#f5f7fa", flex: 1 }}
+          sx={{
+            fontFamily: "monospace",
+            bgcolor: "transparent",
+            color: theme.palette.text.primary,
+            flex: 1,
+            borderRadius: 0,
+            px: 1,
+            "& .MuiInputBase-input": {
+              color: theme.palette.text.primary,
+              backgroundColor: "transparent",
+            },
+            "& .MuiOutlinedInput-root": {
+              backgroundColor: "transparent",
+              borderRadius: 0,
+            },
+          }}
         />
         <Stack
           direction="row"
@@ -340,7 +388,7 @@ const NoteEditor = ({
           sx={{
             position: { md: "sticky" },
             bottom: { md: 0 },
-            bgcolor: { md: "#fff" },
+            bgcolor: "transparent",
             py: { md: 1 },
             zIndex: 2,
           }}
@@ -358,7 +406,13 @@ const NoteEditor = ({
             color="inherit"
             disabled={loading}
             onClick={() => {
-              if (mode === "new" && onDelete) {
+              if (mode === "edit") {
+                if (typeof onCancel === "function") {
+                  onCancel({ title, synopsis, content, tags });
+                } else if (typeof onDelete === "function") {
+                  onDelete({ title, synopsis, content, tags });
+                }
+              } else if (mode === "new" && typeof onDelete === "function") {
                 onDelete({ title, synopsis, content, tags });
               }
             }}
@@ -372,21 +426,19 @@ const NoteEditor = ({
         elevation={4}
         sx={{
           flex: 1,
-          p: { xs: 2, sm: 3 },
+          p: { xs: 1, sm: 2, md: 3 },
           minWidth: 0,
           overflow: "auto",
           bgcolor: "#232c34",
           color: "#fff",
           width: { xs: "100%", md: "100%" },
-          maxWidth: { md: "500px" },
+          maxWidth: { xs: "100vw", md: "700px" },
           mt: { xs: 2, md: 0 },
           height: { xs: "auto", md: "80vh" },
           boxSizing: "border-box",
           borderRadius: 3,
           boxShadow: "0 2px 16px 0 rgba(0,0,0,0.10)",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "flex-start",
+          display: "block",
         }}
       >
         <Typography variant="h6" sx={{ mb: 2, color: "#fff" }}>
@@ -417,10 +469,38 @@ const NoteEditor = ({
           sx={{
             fontSize: 16,
             color: "#e0e0e0",
-            flex: 1,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            width: "100%",
+            fontFamily: "inherit",
+            lineHeight: 1.7,
+            textAlign: "left",
+            "& h1": {
+              fontSize: "2rem",
+              fontWeight: 600,
+              margin: "1.2em 0 0.6em 0",
+            },
+            "& h2": {
+              fontSize: "1.5rem",
+              fontWeight: 500,
+              margin: "1em 0 0.5em 0",
+            },
+            "& h3": {
+              fontSize: "1.2rem",
+              fontWeight: 500,
+              margin: "0.8em 0 0.4em 0",
+            },
+            "& p": {
+              margin: "0.5em 0",
+            },
+            "& ul, & ol": {
+              margin: "0.5em 0 0.5em 1.5em",
+            },
+            "& code": {
+              background: "#232c34",
+              color: "#f8f8f2",
+              padding: "2px 6px",
+              borderRadius: 4,
+              fontSize: 14,
+            },
           }}
         >
           {content ? (

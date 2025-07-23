@@ -17,7 +17,7 @@ app.use(
     origin: [
       "http://localhost:5173",
       "https://s5kw9q5f-5173.uks1.devtunnels.ms",
-      "https://notley.onrender.com"
+      "https://notley.onrender.com",
     ],
     credentials: true,
     methods: ["POST", "GET", "PUT", "PATCH", "DELETE"],

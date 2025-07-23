@@ -43,7 +43,7 @@ const NewNote = () => {
     try {
       await axiosInstance.post("/entries", data);
       let drafts: Draft[] = JSON.parse(
-        localStorage.getItem("notelyDrafts") || "[]",
+        localStorage.getItem("notelyDrafts") || "[]"
       );
       if (draftId) {
         drafts = drafts.filter((d: Draft) => d.id !== draftId);
@@ -52,7 +52,7 @@ const NewNote = () => {
           (d: Draft) =>
             d.title !== data.title ||
             d.synopsis !== data.synopsis ||
-            d.content !== data.content,
+            d.content !== data.content
         );
       }
       localStorage.setItem("notelyDrafts", JSON.stringify(drafts));
@@ -60,7 +60,7 @@ const NewNote = () => {
     } catch (e) {
       console.log(e);
       let drafts: Draft[] = JSON.parse(
-        localStorage.getItem("notelyDrafts") || "[]",
+        localStorage.getItem("notelyDrafts") || "[]"
       );
       if (draftId) {
         drafts = drafts.filter((d: Draft) => d.id !== draftId);
@@ -69,7 +69,7 @@ const NewNote = () => {
           (d: Draft) =>
             d.title !== data.title ||
             d.synopsis !== data.synopsis ||
-            d.content !== data.content,
+            d.content !== data.content
         );
       }
       localStorage.setItem("notelyDrafts", JSON.stringify(drafts));
@@ -85,7 +85,6 @@ const NewNote = () => {
     content: string;
     tags: string[];
   }) => {
-    // Only save/update draft if there is any content
     if (
       data.title.trim() ||
       data.synopsis.trim() ||
@@ -93,12 +92,12 @@ const NewNote = () => {
       (data.tags && data.tags.length > 0)
     ) {
       let drafts: Draft[] = JSON.parse(
-        localStorage.getItem("notelyDrafts") || "[]",
+        localStorage.getItem("notelyDrafts") || "[]"
       );
       if (draftId) {
         // Update existing draft
         drafts = drafts.map((d: Draft) =>
-          d.id === draftId ? { ...data, id: draftId } : d,
+          d.id === draftId ? { ...data, id: draftId } : d
         );
       } else {
         // Add new draft with a new id

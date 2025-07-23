@@ -3,29 +3,39 @@ import {
   Toolbar,
   Box,
   Button,
-  InputBase,
   Stack,
-  alpha,
+  IconButton,
+  useMediaQuery,
 } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
+import MenuIcon from "@mui/icons-material/Menu";
 import NoteAddIcon from "@mui/icons-material/NoteAdd";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "@mui/material";
 import { useAuth, useSidebar } from "../../store/useStore";
 import AvatarMenu from "./AvatarMenu";
 import Sidebar from "./Sidebar";
+import DrawerMenu from "./Drawer";
+import { useState } from "react";
+import NoteSearch from "../entries/NoteSearch";
 
 function HeaderLoggedIn() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { sidebarCollapsed, setSidebarCollapsed } = useSidebar();
   const sidebarWidth = sidebarCollapsed ? 64 : 220;
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   return (
     <>
-      <Sidebar
-        collapsed={sidebarCollapsed}
-        setCollapsed={setSidebarCollapsed}
-      />
+      {/* Sidebar only on md+ screens */}
+      {!isMobile && (
+        <Sidebar
+          collapsed={sidebarCollapsed}
+          setCollapsed={setSidebarCollapsed}
+        />
+      )}
       <AppBar
         position="fixed"
         elevation={0}
@@ -50,16 +60,29 @@ function HeaderLoggedIn() {
         >
           {/* Logo and Welcome */}
           <Box sx={{ display: "flex", alignItems: "center", minWidth: 48 }}>
-            <img
-              src="/logo.jpg"
-              alt="Logo"
-              style={{
-                height: 32,
-                marginRight: 12,
-                verticalAlign: "middle",
-                borderRadius: 2,
-              }}
-            />
+            {isMobile && (
+              <IconButton
+                edge="start"
+                color="inherit"
+                aria-label="menu"
+                onClick={() => setDrawerOpen(true)}
+                sx={{ mr: 1, ml: 1 }}
+              >
+                <MenuIcon />
+              </IconButton>
+            )}
+            <Box sx={{ display: { xs: "none", sm: "block" } }}>
+              <img
+                src="/logo.jpg"
+                alt="Logo"
+                style={{
+                  height: 32,
+                  marginRight: 12,
+                  verticalAlign: "middle",
+                  borderRadius: 2,
+                }}
+              />
+            </Box>
             <Box
               sx={{
                 color: "#fff",
@@ -81,51 +104,52 @@ function HeaderLoggedIn() {
               mx: 2,
             }}
           >
-            <Box
-              sx={{
-                bgcolor: alpha("#232c34", 0.9),
-                borderRadius: 1.5,
-                px: 2,
-                py: 0.5,
-                display: "flex",
-                alignItems: "center",
-                minWidth: 320,
-                maxWidth: 480,
-                width: "100%",
-              }}
-            >
-              <SearchIcon sx={{ color: "#b0b8c1", mr: 1 }} />
-              <InputBase
-                placeholder="Search notes"
-                sx={{ color: "#fff", flex: 1, fontSize: 16 }}
-                inputProps={{ "aria-label": "search notes" }}
-              />
-            </Box>
+            <NoteSearch />
           </Box>
           {/* Right Side: New Note Button & Avatar */}
           <Stack direction="row" spacing={2} alignItems="center">
-            <Button
-              variant="contained"
-              startIcon={<NoteAddIcon />}
+            <Box sx={{ display: { xs: "none", sm: "block" } }}>
+              <Button
+                variant="contained"
+                startIcon={<NoteAddIcon sx={{ fontSize: 22 }} />}
+                sx={{
+                  bgcolor: "#3d82f5",
+                  color: "#fff",
+                  textTransform: "none",
+                  fontWeight: 600,
+                  borderRadius: 1.5,
+                  boxShadow: "none",
+                  minWidth: 110,
+                  px: 2.5,
+                  fontSize: 16,
+                  height: 40,
+                  "& .MuiButton-startIcon": {
+                    mr: 1,
+                  },
+                  "&:hover": { bgcolor: "#2563eb" },
+                }}
+                onClick={() => navigate("/notes/new")}
+              >
+                New note
+              </Button>
+            </Box>
+            <Box
               sx={{
-                bgcolor: "#3d82f5",
-                color: "#fff",
-                textTransform: "none",
-                fontWeight: 600,
-                borderRadius: 1.5,
-                boxShadow: "none",
-                "&:hover": { bgcolor: "#2563eb" },
-                minWidth: 110,
-                px: 2.5,
+                "& .MuiAvatar-root": {
+                  width: { xs: 32, sm: 40 },
+                  height: { xs: 32, sm: 40 },
+                },
               }}
-              onClick={() => navigate("/notes/new")}
             >
-              New note
-            </Button>
-            <AvatarMenu />
+              <AvatarMenu />
+            </Box>
           </Stack>
         </Toolbar>
       </AppBar>
+      {/* Drawer for mobile */}
+      {isMobile && (
+        <DrawerMenu open={drawerOpen} onClose={() => setDrawerOpen(false)} />
+      )}
     </>
   );
 }

@@ -41,38 +41,6 @@ function Footer() {
               </IconButton>
             </Box>
           </Box>
-          {/* Product Links */}
-          <Box flex={1}>
-            <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-              Product
-            </Typography>
-            <Stack spacing={1}>
-              <Link
-                href="#"
-                color="text.secondary"
-                underline="hover"
-                variant="body2"
-              >
-                Features
-              </Link>
-              <Link
-                href="#"
-                color="text.secondary"
-                underline="hover"
-                variant="body2"
-              >
-                Download - Coming soon
-              </Link>
-              <Link
-                href="#"
-                color="text.secondary"
-                underline="hover"
-                variant="body2"
-              >
-                API
-              </Link>
-            </Stack>
-          </Box>
           {/* Company Links */}
           <Box flex={1}>
             <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>

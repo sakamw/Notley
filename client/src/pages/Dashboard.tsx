@@ -2,26 +2,20 @@ import {
   Box,
   Typography,
   Button,
-  Stack,
   Paper,
-  IconButton,
-  Tooltip,
   CircularProgress,
   Alert,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
 } from "@mui/material";
 import { useSidebar } from "../store/useStore";
-import { PushPin, PushPinOutlined } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import axiosInstance from "../api/axios";
 import { useNavigate } from "react-router-dom";
-import { Bookmark, BookmarkBorder } from "@mui/icons-material";
 import { useBookmarks, useAuth } from "../store/useStore";
 import { toast } from "react-toastify";
+import { useTheme } from "@mui/material/styles";
+import NoteCard from "../components/dashboard/NoteCard";
+import CardsContainer from "../components/dashboard/CardsContainer";
+import DeleteNoteDialog from "../components/dashboard/DeleteNoteDialog";
 
 interface Note {
   id: string;
@@ -30,22 +24,6 @@ interface Note {
   tags: string[];
   pinned: boolean;
 }
-
-const CardsContainer = ({ children }: { children: React.ReactNode }) => (
-  <Box
-    sx={{
-      display: "flex",
-      flexWrap: "wrap",
-      gap: 2,
-      justifyContent: "flex-start",
-      mb: 3,
-      width: "100%",
-      maxWidth: "100%",
-    }}
-  >
-    {children}
-  </Box>
-);
 
 const Dashboard = () => {
   const { sidebarCollapsed } = useSidebar();
@@ -56,8 +34,8 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const { addBookmark, removeBookmark, isBookmarked } = useBookmarks();
   const { user } = useAuth();
+  const theme = useTheme();
 
-  // Dialog state for delete
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [noteToDelete, setNoteToDelete] = useState<string | null>(null);
 
@@ -77,8 +55,8 @@ const Dashboard = () => {
       try {
         await axiosInstance.delete(`/entries/${noteToDelete}`);
         setNotes((prev) => prev.filter((note) => note.id !== noteToDelete));
-      } catch (e) {
-        console.log(e);
+      } catch {
+        // error handling
       }
       closeDeleteDialog();
     }
@@ -106,15 +84,15 @@ const Dashboard = () => {
     try {
       await axiosInstance.patch(`/entries/${noteId}/pin`, { pinned });
       setNotes((prev) =>
-        prev.map((note) => (note.id === noteId ? { ...note, pinned } : note)),
+        prev.map((note) => (note.id === noteId ? { ...note, pinned } : note))
       );
       if (pinned) {
         toast.success("Note pinned");
       } else {
         toast.info("Note unpinned");
       }
-    } catch (e) {
-      console.log(e);
+    } catch {
+      // error handling
     }
   };
 
@@ -134,168 +112,26 @@ const Dashboard = () => {
   const pinnedNotes = notes.filter((n) => n.pinned);
   const unpinnedNotes = notes.filter((n) => !n.pinned);
 
-  const NoteCard = ({ note }: { note: Note }) => (
-    <Box
-      sx={{
-        width: { xs: "100%", sm: "48%", md: "24%" },
-        minWidth: 320,
-        maxWidth: 420,
-        mb: 2,
-        flexGrow: 1,
-      }}
-    >
-      <Paper
-        sx={{
-          p: { xs: 3, sm: 4 },
-          position: "relative",
-          width: "100%",
-          minHeight: 220,
-          height: "100%",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-        }}
-      >
-        {/* Header row: title + actions */}
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            mb: 1,
-          }}
-        >
-          <Typography
-            variant="h6"
-            fontWeight={600}
-            sx={{
-              pr: 1,
-              flex: 1,
-              minWidth: 0,
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {note.title}
-          </Typography>
-          <Box sx={{ display: "flex", gap: 1 }}>
-            <Tooltip title={note.pinned ? "Unpin note" : "Pin note"}>
-              <IconButton
-                size="small"
-                onClick={() => handlePin(note.id, !note.pinned)}
-                color="primary"
-              >
-                {note.pinned ? <PushPin /> : <PushPinOutlined />}
-              </IconButton>
-            </Tooltip>
-            <Tooltip
-              title={
-                isBookmarked(user?.id?.toString() || "guest", note.id)
-                  ? "Remove bookmark"
-                  : "Bookmark"
-              }
-            >
-              <IconButton
-                size="small"
-                onClick={() =>
-                  isBookmarked(user?.id?.toString() || "guest", note.id)
-                    ? handleBookmark(note.id, false)
-                    : handleBookmark(note.id, true)
-                }
-                color="primary"
-              >
-                {isBookmarked(user?.id?.toString() || "guest", note.id) ? (
-                  <Bookmark />
-                ) : (
-                  <BookmarkBorder />
-                )}
-              </IconButton>
-            </Tooltip>
-          </Box>
-        </Box>
-
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          mb={2}
-          sx={{
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            display: "-webkit-box",
-            WebkitLineClamp: 3,
-            WebkitBoxOrient: "vertical",
-            minHeight: 60,
-          }}
-        >
-          {note.synopsis}
-        </Typography>
-
-        <Stack direction="row" spacing={1} mb={2} flexWrap="wrap">
-          {note.tags.map((tag) => (
-            <Typography
-              key={tag}
-              variant="caption"
-              sx={{
-                bgcolor: "#e3e8f0",
-                px: 1,
-                borderRadius: 1,
-                mb: 0.5,
-              }}
-            >
-              #{tag}
-            </Typography>
-          ))}
-        </Stack>
-
-        <Stack direction="row" spacing={1} mt="auto">
-          <Button
-            variant="contained"
-            size="small"
-            sx={{
-              bgcolor: "#2563eb",
-              color: "#fff",
-              "&:hover": { bgcolor: "#1741a6" },
-            }}
-            onClick={() => navigate(`/note/${note.id}`)}
-          >
-            Read More
-          </Button>
-          <Button
-            variant="outlined"
-            size="small"
-            color="primary"
-            onClick={() => navigate(`/edit-note/${note.id}`)}
-          >
-            Edit
-          </Button>
-          <Button
-            variant="outlined"
-            size="small"
-            color="error"
-            onClick={() => openDeleteDialog(note.id)}
-          >
-            Delete
-          </Button>
-        </Stack>
-      </Paper>
-    </Box>
-  );
+  // Handler wrappers for NoteCard
+  const handleEdit = (noteId: string) => navigate(`/edit-note/${noteId}`);
+  const handleReadMore = (noteId: string) => navigate(`/note/${noteId}`);
+  const userId = user?.id?.toString() || "guest";
 
   return (
     <Box
       sx={{
         mt: { xs: "56px", sm: "56px" },
         ml: { xs: 0, sm: `${sidebarWidth}px` },
-        p: { xs: 1, sm: 3 },
+        p: { xs: 0, sm: 3 },
         minHeight: "calc(100vh - 56px)",
         bgcolor: "background.default",
-        width: "100%",
-        maxWidth: "100%",
+        width: "100vw",
+        maxWidth: "100vw",
         boxSizing: "border-box",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
+        overflowX: "hidden",
       }}
     >
       <Typography
@@ -319,19 +155,25 @@ const Dashboard = () => {
         <Box
           sx={{
             width: "100%",
+            maxWidth: 500,
             display: "flex",
             justifyContent: "center",
             mt: 2,
+            px: { xs: 1, sm: 0 },
+            boxSizing: "border-box",
+            overflowX: "hidden",
           }}
         >
           <Paper
             sx={{
-              p: { xs: 2, sm: 4 },
+              p: { xs: 1, sm: 2, md: 4 },
               textAlign: "center",
               mb: 4,
               maxWidth: 500,
               borderRadius: 3,
               width: "100%",
+              boxSizing: "border-box",
+              overflowX: "hidden",
             }}
           >
             <Typography variant="h6" color="text.secondary" mb={2}>
@@ -365,7 +207,17 @@ const Dashboard = () => {
               </Typography>
               <CardsContainer>
                 {pinnedNotes.map((note) => (
-                  <NoteCard key={note.id} note={note} />
+                  <NoteCard
+                    key={note.id}
+                    note={note}
+                    onPin={handlePin}
+                    onBookmark={handleBookmark}
+                    isBookmarked={(id) => isBookmarked(userId, id)}
+                    onEdit={handleEdit}
+                    onDelete={openDeleteDialog}
+                    onReadMore={handleReadMore}
+                    theme={theme}
+                  />
                 ))}
               </CardsContainer>
             </>
@@ -383,7 +235,17 @@ const Dashboard = () => {
               </Typography>
               <CardsContainer>
                 {unpinnedNotes.map((note) => (
-                  <NoteCard key={note.id} note={note} />
+                  <NoteCard
+                    key={note.id}
+                    note={note}
+                    onPin={handlePin}
+                    onBookmark={handleBookmark}
+                    isBookmarked={(id) => isBookmarked(userId, id)}
+                    onEdit={handleEdit}
+                    onDelete={openDeleteDialog}
+                    onReadMore={handleReadMore}
+                    theme={theme}
+                  />
                 ))}
               </CardsContainer>
             </>
@@ -391,23 +253,11 @@ const Dashboard = () => {
         </>
       )}
 
-      <Dialog open={deleteDialogOpen} onClose={closeDeleteDialog}>
-        <DialogTitle>Delete Note?</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Are you sure you want to delete this note? It will appear in the
-            trash.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={closeDeleteDialog} color="inherit">
-            Cancel
-          </Button>
-          <Button onClick={confirmDelete} color="error" variant="contained">
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <DeleteNoteDialog
+        open={deleteDialogOpen}
+        onClose={closeDeleteDialog}
+        onConfirm={confirmDelete}
+      />
     </Box>
   );
 };

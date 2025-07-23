@@ -8,6 +8,7 @@ import {
   CircularProgress,
   Paper,
   Stack,
+  useTheme,
 } from "@mui/material";
 import ReactMarkdown from "react-markdown";
 
@@ -23,6 +24,7 @@ const NoteView = () => {
   const [note, setNote] = useState<Note | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const theme = useTheme();
 
   useEffect(() => {
     if (!id) return;
@@ -87,7 +89,38 @@ const NoteView = () => {
             />
           ))}
         </Stack>
-        <Box sx={{ fontSize: 16, color: "#232c34" }}>
+        <Box
+          sx={{
+            fontSize: 16,
+            color: theme.palette.mode === "dark" ? "#e0e0e0" : "#232c34",
+            lineHeight: 1.7,
+            wordBreak: "break-word",
+            "& h1": {
+              fontSize: "2rem",
+              fontWeight: 600,
+              margin: "1.2em 0 0.6em 0",
+            },
+            "& h2": {
+              fontSize: "1.5rem",
+              fontWeight: 500,
+              margin: "1em 0 0.5em 0",
+            },
+            "& h3": {
+              fontSize: "1.2rem",
+              fontWeight: 500,
+              margin: "0.8em 0 0.4em 0",
+            },
+            "& p": { margin: "0.5em 0" },
+            "& ul, & ol": { margin: "0.5em 0 0.5em 1.5em" },
+            "& code": {
+              background: "#232c34",
+              color: "#f8f8f2",
+              padding: "2px 6px",
+              borderRadius: 4,
+              fontSize: 14,
+            },
+          }}
+        >
           <ReactMarkdown>{note.content}</ReactMarkdown>
         </Box>
       </Paper>

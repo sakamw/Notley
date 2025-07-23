@@ -72,7 +72,10 @@ function Login() {
       }
       setUser(data);
       toast.success("Login successful!");
-      navigate("/dashboard");
+      // Redirect to originally requested page, or dashboard by default
+      const from =
+        (location.state as { from?: Location })?.from?.pathname || "/dashboard";
+      navigate(from, { replace: true });
     },
   });
 

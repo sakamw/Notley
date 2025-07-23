@@ -21,7 +21,10 @@
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+
+    /* Added for NodeJS namespace support */
+    "types": ["node"]
   },
   "include": ["src"]
 }

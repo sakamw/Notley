@@ -80,11 +80,23 @@ function ThemedAppContent() {
   );
 }
 
+function AuthInitializer() {
+  const { setLoading } = useAuth();
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      setLoading(false);
+    }
+  }, [setLoading]);
+  return null;
+}
+
 function AppContent() {
   const { isAuthenticated } = useAuth();
   const location = useLocation();
   return (
     <>
+      <AuthInitializer />
       <Header />
       <Routes>
         <Route path="/" element={<LandingPage />} />

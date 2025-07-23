@@ -1,5 +1,6 @@
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import ProtectedRoute from "./components/common/ProtectedRoutes";
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
 import ForgotPassword from "./pages/auth/ForgotPassword";
@@ -52,7 +53,7 @@ function ThemedAppContent() {
 
   const dynamicTheme = useMemo(
     () => createDynamicTheme(themeMode),
-    [themeMode]
+    [themeMode],
   );
 
   const alwaysLightRoutes = [
@@ -92,17 +93,87 @@ function AppContent() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:id/:token" element={<ResetPassword />} />
         <Route path="/activate/:id/:token" element={<ActivateAccount />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/trash" element={<Trash />} />
-        <Route path="/bookmarks" element={<Bookmarks />} />
-        <Route path="/drafts" element={<Drafts />} />
-        <Route path="/tags/:tag" element={<TagNotes />} />
-        <Route path="/notes/new" element={<NewNote />} />
-        <Route path="/edit-notes" element={<EditNotes />} />
-        <Route path="/edit-note/:id" element={<EditNote />} />
-        <Route path="/note/:id" element={<NoteView />} />
+        <Route
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+          path="/dashboard"
+        />
+        <Route
+          element={
+            <ProtectedRoute>
+              <Trash />
+            </ProtectedRoute>
+          }
+          path="/trash"
+        />
+        <Route
+          element={
+            <ProtectedRoute>
+              <Bookmarks />
+            </ProtectedRoute>
+          }
+          path="/bookmarks"
+        />
+        <Route
+          element={
+            <ProtectedRoute>
+              <Drafts />
+            </ProtectedRoute>
+          }
+          path="/drafts"
+        />
+        <Route
+          element={
+            <ProtectedRoute>
+              <TagNotes />
+            </ProtectedRoute>
+          }
+          path="/tags/:tag"
+        />
+        <Route
+          element={
+            <ProtectedRoute>
+              <NewNote />
+            </ProtectedRoute>
+          }
+          path="/notes/new"
+        />
+        <Route
+          element={
+            <ProtectedRoute>
+              <EditNotes />
+            </ProtectedRoute>
+          }
+          path="/edit-notes"
+        />
+        <Route
+          element={
+            <ProtectedRoute>
+              <EditNote />
+            </ProtectedRoute>
+          }
+          path="/edit-note/:id"
+        />
+        <Route
+          element={
+            <ProtectedRoute>
+              <NoteView />
+            </ProtectedRoute>
+          }
+          path="/note/:id"
+        />
+        <Route
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+          path="/profile"
+        />
         <Route path="/resend-activation" element={<ResendActivation />} />
-        <Route path="/profile" element={<ProfilePage />} />
       </Routes>
       {!isAuthenticated &&
         ![

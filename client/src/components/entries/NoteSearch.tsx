@@ -41,7 +41,7 @@ const NoteSearch: React.FC = () => {
     debounceRef.current = setTimeout(async () => {
       try {
         const res = await axiosInstance.get(
-          `/entries/search?q=${encodeURIComponent(value)}`
+          `/entries/search?q=${encodeURIComponent(value)}`,
         );
         setResults(res.data || []);
         setOpen(true);

@@ -27,7 +27,7 @@ export const register = async (req: Request, res: Response) => {
     const activationToken = jwt.sign(
       { id: user.id, email: user.email },
       process.env.JWT_SECRET,
-      { expiresIn: "1d" }
+      { expiresIn: "1d" },
     );
     const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
     const activationLink = `${frontendUrl}/activate/${user.id}/${activationToken}`;
@@ -318,7 +318,7 @@ export const resendActivation = async (req: Request, res: Response) => {
     const activationToken = jwt.sign(
       { id: user.id, email: user.email },
       process.env.JWT_SECRET,
-      { expiresIn: "1d" }
+      { expiresIn: "1d" },
     );
     const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
     const activationLink = `${frontendUrl}/activate/${user.id}/${activationToken}`;

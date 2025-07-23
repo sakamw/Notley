@@ -24,7 +24,7 @@ router.post(
   verifyUserInfo,
   checkEmailAndUsernameReuse,
   verifyPassStrength,
-  register
+  register,
 );
 router.post("/login", login);
 router.post("/logout", logout);
@@ -32,7 +32,7 @@ router.post(
   "/password",
   authenticateJWT,
   verifyNewPassStrength,
-  updateUserPassword
+  updateUserPassword,
 );
 
 router.post("/forgot-password", forgotPassword);

@@ -13,7 +13,7 @@ export interface AuthRequest extends Request {
 export async function authenticateJWT(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const token =
     req.cookies?.authToken ||

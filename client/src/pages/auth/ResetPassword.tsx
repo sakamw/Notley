@@ -49,7 +49,7 @@ const ResetPassword = () => {
       ) {
         toast.error(
           (err.response.data as { message?: string }).message ||
-            "Failed to reset password. Try again."
+            "Failed to reset password. Try again.",
         );
       } else {
         toast.error("Failed to reset password. Try again.");

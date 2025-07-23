@@ -25,7 +25,7 @@ const ResendActivation = () => {
         email,
       });
       setMessage(
-        res.data.message || "Activation email resent. Please check your inbox."
+        res.data.message || "Activation email resent. Please check your inbox.",
       );
     } catch (err: unknown) {
       if (
@@ -41,7 +41,7 @@ const ResendActivation = () => {
       ) {
         setError(
           (err.response.data as { message?: string }).message ||
-            "Failed to resend activation email."
+            "Failed to resend activation email.",
         );
       } else {
         setError("Failed to resend activation email.");

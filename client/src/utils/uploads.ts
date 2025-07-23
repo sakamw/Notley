@@ -11,7 +11,7 @@ export async function uploadImageToCloudinary(file: File): Promise<string> {
     {
       method: "POST",
       body: formData,
-    }
+    },
   );
 
   if (!response.ok) {

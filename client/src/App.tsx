@@ -193,6 +193,7 @@ function AppContent() {
           "/signup",
           "/forgot-password",
           "/activate/:id/:token",
+          "/reset-password/:id/:token",
         ].includes(location.pathname) && <Footer />}
     </>
   );

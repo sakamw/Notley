@@ -83,10 +83,12 @@ const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
                 {!collapsed && (
                   <ListItemText
                     primary={item.label}
-                    primaryTypographyProps={{
-                      fontWeight: 600,
-                      fontSize: 13,
-                      display: { xs: "none", sm: "block" },
+                    slotProps={{
+                      primary: {
+                        fontWeight: 600,
+                        fontSize: 13,
+                        display: { xs: "none", sm: "block" },
+                      },
                     }}
                   />
                 )}
@@ -128,7 +130,9 @@ const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
                 {!collapsed && (
                   <ListItemText
                     primary={item.label}
-                    primaryTypographyProps={{ fontSize: 13 }}
+                    slotProps={{
+                      primary: { fontSize: 13 },
+                    }}
                   />
                 )}
               </ListItemButton>
@@ -169,7 +173,9 @@ const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
                 {!collapsed && (
                   <ListItemText
                     primary={item.label}
-                    primaryTypographyProps={{ fontSize: 13 }}
+                    slotProps={{
+                      primary: { fontSize: 13 },
+                    }}
                   />
                 )}
               </ListItemButton>

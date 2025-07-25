@@ -18,7 +18,7 @@ function ForgotPassword() {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMsg, setSnackbarMsg] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
-    "success"
+    "success",
   );
 
   const { isPending, mutate } = useMutation({
@@ -26,7 +26,7 @@ function ForgotPassword() {
     mutationFn: async (payload: { email: string }) => {
       const response = await axiosInstance.post(
         "/auth/forgot-password",
-        payload
+        payload,
       );
       return response.data;
     },

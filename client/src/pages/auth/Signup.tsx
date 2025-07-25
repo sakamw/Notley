@@ -195,15 +195,17 @@ const Signup = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             sx={{ mt: 2 }}
-            InputProps={{
-              endAdornment: (
-                <IconButton
-                  onClick={() => setShowPassword((s) => !s)}
-                  edge="end"
-                >
-                  {showPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              ),
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <IconButton
+                    onClick={() => setShowPassword((s) => !s)}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                ),
+              },
             }}
           />
           <TextField
@@ -215,15 +217,17 @@ const Signup = () => {
             value={confPass}
             onChange={(e) => setConfPass(e.target.value)}
             sx={{ mt: 2 }}
-            InputProps={{
-              endAdornment: (
-                <IconButton
-                  onClick={() => setShowConfPassword((s) => !s)}
-                  edge="end"
-                >
-                  {showConfPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              ),
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <IconButton
+                    onClick={() => setShowConfPassword((s) => !s)}
+                    edge="end"
+                  >
+                    {showConfPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                ),
+              },
             }}
           />
           <Button

@@ -89,7 +89,7 @@ const EditNote = () => {
     content: string;
     tags: string[];
   }) => {
-    // Check if any field has changed
+    // Checking if any field has changed
     if (
       current.title === note.title &&
       current.synopsis === note.synopsis &&

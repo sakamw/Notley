@@ -67,8 +67,7 @@ export const updateEntry = async (req: AuthRequest, res: Response) => {
   try {
     const userId = String(req.user?.id);
     const { id } = req.params;
-    const { title, synopsis, content, isDeleted, isPublic, tags } =
-      req.body;
+    const { title, synopsis, content, isDeleted, isPublic, tags } = req.body;
     const entry = await client.entry.findFirst({
       where: { id, authorId: userId, isDeleted: false },
     });
@@ -179,7 +178,7 @@ export const restoreEntry = async (req: AuthRequest, res: Response) => {
 
 export const permanentlyDeleteEntry = async (
   req: AuthRequest,
-  res: Response
+  res: Response,
 ) => {
   try {
     const userId = String(req.user?.id);

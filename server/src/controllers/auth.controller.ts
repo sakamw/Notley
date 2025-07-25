@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import bcrypt from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { AuthRequest } from "../middlewares/userMiddleware";
 import nodemailer from "nodemailer";
+import { AuthRequest } from "../middlewares/userMiddleware";
 
 const client = new PrismaClient();
 
@@ -22,12 +22,13 @@ export const register = async (req: Request, res: Response) => {
       },
     });
     if (!process.env.JWT_SECRET) {
-      return res.status(500).json({ message: "Server configuration error." });
+      res.status(500).json({ message: "Server configuration error." });
+      return;
     }
     const activationToken = jwt.sign(
       { id: user.id, email: user.email },
       process.env.JWT_SECRET,
-      { expiresIn: "1d" },
+      { expiresIn: "1d" }
     );
     const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
     const activationLink = `${frontendUrl}/activate/${user.id}/${activationToken}`;
@@ -64,13 +65,16 @@ export const activateAccount = async (req: Request, res: Response) => {
   try {
     const user = await client.user.findUnique({ where: { id } });
     if (!user) {
-      return res.status(404).json({ message: "User not found." });
+      res.status(404).json({ message: "User not found." });
+      return;
     }
     if (user.verified) {
-      return res.status(400).json({ message: "Account already activated." });
+      res.status(400).json({ message: "Account already activated." });
+      return;
     }
     if (!process.env.JWT_SECRET) {
-      return res.status(500).json({ message: "Server configuration error." });
+      res.status(500).json({ message: "Server configuration error." });
+      return;
     }
     try {
       const payload = jwt.verify(token, process.env.JWT_SECRET) as {
@@ -78,19 +82,20 @@ export const activateAccount = async (req: Request, res: Response) => {
         email: string;
       };
       if (payload.id !== user.id || payload.email !== user.email) {
-        return res.status(400).json({ message: "Invalid activation token." });
+        res.status(400).json({ message: "Invalid activation token." });
+        return;
       }
       await client.user.update({ where: { id }, data: { verified: true } });
-      // Redirect to login page with success param
       const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
-      return res.redirect(`${frontendUrl}/login?activated=1`);
-    } catch (error) {
-      return res
-        .status(400)
-        .json({ message: "Invalid or expired activation link." });
+      res.redirect(`${frontendUrl}/login?activated=1`);
+      return;
+    } catch (e) {
+      res.status(400).json({ message: "Invalid or expired activation link." });
+      return;
     }
-  } catch (error) {
-    return res.status(500).json({ message: "Error activating account." });
+  } catch (e) {
+    res.status(500).json({ message: "Error activating account." });
+    return;
   }
 };
 
@@ -138,7 +143,6 @@ export const login = async (req: Request, res: Response) => {
     }
 
     const token = jwt.sign(userDetails, process.env.JWT_SECRET);
-    // Set cookie options based on environment
     const isProduction = process.env.NODE_ENV === "production";
     res
       .cookie("authToken", token, {
@@ -148,7 +152,7 @@ export const login = async (req: Request, res: Response) => {
         path: "/",
       })
       .json({ ...userDetails });
-  } catch (error) {
+  } catch (e) {
     res.status(500).json({ message: "Server error during login." });
   }
 };
@@ -211,16 +215,18 @@ export const forgotPassword = async (req: Request, res: Response) => {
   try {
     const oldUser = await client.user.findUnique({ where: { email } });
     if (!oldUser) {
-      return res.status(200).json({
+      res.status(200).json({
         message: "A reset link has been sent.",
       });
+      return;
     }
     if (!process.env.JWT_SECRET) {
-      return res.status(500).json({ message: "Server configuration error." });
+      res.status(500).json({ message: "Server configuration error." });
+      return;
     }
     const secret = process.env.JWT_SECRET + oldUser.password;
     const token = jwt.sign({ email: oldUser.email, id: oldUser.id }, secret, {
-      expiresIn: "5m",
+      expiresIn: "10m",
     });
 
     const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
@@ -238,13 +244,13 @@ export const forgotPassword = async (req: Request, res: Response) => {
       from: process.env.EMAIL_USER,
       to: oldUser.email,
       subject: "Password Reset Request",
-      html: `<p>You requested a password reset. Click <a href="${link}">here</a> to reset your password. This link will expire in 5 minutes.</p>`,
+      html: `<p>You requested a password reset. Click <a href="${link}">here</a> to reset your password. This link will expire in 10 minutes.</p>`,
     });
 
     res.status(200).json({
       message: "A reset link has been sent.",
     });
-  } catch (error) {
+  } catch (e) {
     res.status(500).json({ message: "Error generating reset link." });
   }
 };
@@ -255,50 +261,62 @@ export const resetPassword = async (req: Request, res: Response) => {
     try {
       const oldUser = await client.user.findUnique({ where: { id } });
       if (!oldUser) {
-        return res.status(404).json({ message: "User not found" });
+        res.status(404).json({ message: "User not found" });
+        return;
       }
       if (!process.env.JWT_SECRET) {
-        return res.status(500).json({ message: "Server configuration error." });
+        res.status(500).json({ message: "Server configuration error." });
+        return;
       }
       const secret = process.env.JWT_SECRET + oldUser.password;
       try {
         jwt.verify(token, secret);
-        return res
+        res
           .status(200)
-          .json({ message: "Token verified. You can reset your password." });
-      } catch (error) {
-        return res.status(400).json({ message: "Invalid or expired token." });
+          .json({ message: "Email verified. You can reset your password." });
+        return;
+      } catch (e) {
+        res.status(400).json({ message: "Invalid or expired link." });
+        return;
       }
-    } catch (error) {
-      return res.status(500).json({ message: "Error verifying reset link." });
+    } catch (e) {
+      res.status(500).json({ message: "Error verifying reset link." });
+      return;
     }
   } else if (req.method === "POST") {
     const { password } = req.body;
     if (!password) {
-      return res.status(400).json({ message: "Password is required." });
+      res.status(400).json({ message: "Password is required." });
+      return;
     }
     try {
       const oldUser = await client.user.findUnique({ where: { id } });
       if (!oldUser) {
-        return res.status(404).json({ message: "User not found" });
+        res.status(404).json({ message: "User not found" });
+        return;
       }
       if (!process.env.JWT_SECRET) {
-        return res.status(500).json({ message: "Server configuration error." });
+        res.status(500).json({ message: "Server configuration error." });
+        return;
       }
       const secret = process.env.JWT_SECRET + oldUser.password;
       try {
         jwt.verify(token, secret);
         const hashed = await bcrypt.hash(password, 10);
         await client.user.update({ where: { id }, data: { password: hashed } });
-        return res.status(200).json({ message: "Password reset successful." });
-      } catch (error) {
-        return res.status(400).json({ message: "Invalid or expired token." });
+        res.status(200).json({ message: "Password reset successful." });
+        return;
+      } catch (e) {
+        res.status(400).json({ message: "Invalid or expired token." });
+        return;
       }
-    } catch (error) {
-      return res.status(500).json({ message: "Error resetting password." });
+    } catch (e) {
+      res.status(500).json({ message: "Error resetting password." });
+      return;
     }
   } else {
-    return res.status(405).json({ message: "Method not allowed." });
+    res.status(405).json({ message: "Method not allowed." });
+    return;
   }
 };
 
@@ -307,18 +325,21 @@ export const resendActivation = async (req: Request, res: Response) => {
   try {
     const user = await client.user.findUnique({ where: { email } });
     if (!user) {
-      return res.status(404).json({ message: "User not found." });
+      res.status(404).json({ message: "User not found." });
+      return;
     }
     if (user.verified) {
-      return res.status(400).json({ message: "Account already activated." });
+      res.status(400).json({ message: "Account already activated." });
+      return;
     }
     if (!process.env.JWT_SECRET) {
-      return res.status(500).json({ message: "Server configuration error." });
+      res.status(500).json({ message: "Server configuration error." });
+      return;
     }
     const activationToken = jwt.sign(
       { id: user.id, email: user.email },
       process.env.JWT_SECRET,
-      { expiresIn: "1d" },
+      { expiresIn: "1d" }
     );
     const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
     const activationLink = `${frontendUrl}/activate/${user.id}/${activationToken}`;
@@ -335,12 +356,12 @@ export const resendActivation = async (req: Request, res: Response) => {
       subject: "Activate Your Account",
       html: `<p>Please <a href="${activationLink}">activate your account</a> to start using Notely. This link will expire in 24 hours.</p>`,
     });
-    return res
+    res
       .status(200)
       .json({ message: "Activation email resent. Please check your inbox." });
-  } catch (error) {
-    return res
-      .status(500)
-      .json({ message: "Error resending activation email." });
+    return;
+  } catch (e) {
+    res.status(500).json({ message: "Error resending activation email." });
+    return;
   }
 };

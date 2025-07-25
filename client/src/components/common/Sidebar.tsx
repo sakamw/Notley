@@ -47,7 +47,7 @@ const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
         width: collapsed ? 64 : 220,
         bgcolor: "#2d3842",
         color: "#fff",
-        height: { xs: "100vh", sm: "calc(100vh - 56px)" },
+        height: { xs: "100vh", sm: "calc(100vh - 5.6rem)" },
         display: "flex",
         flexDirection: "column",
         borderRight: "1px solid #1a222b",

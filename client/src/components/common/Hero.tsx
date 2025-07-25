@@ -10,7 +10,7 @@ function Hero() {
         minHeight: "100vh",
         display: "flex",
         alignItems: "center",
-        pt: { xs: "56px", sm: "64px" },
+        pt: { xs: "5.6rem", sm: "6.4rem" },
       }}
     >
       <Box

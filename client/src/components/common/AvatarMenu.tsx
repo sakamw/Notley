@@ -42,12 +42,12 @@ const AvatarMenu = () => {
     setUploading(true);
     try {
       const url = await uploadImageToCloudinary(file);
-      // Persist avatar to backend
+      // Persisting avatar
       const updatedUser = await updateUserAvatarUrl(url);
       setUser(updatedUser);
       setSnackbarOpen(true);
-    } catch (err) {
-      console.error(err);
+    } catch (e) {
+      console.error(e);
       alert("Failed to upload avatar. Please try again.");
     } finally {
       setUploading(false);

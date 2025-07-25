@@ -16,9 +16,9 @@ import { authenticateJWT } from "../middlewares/userMiddleware";
 
 const router = Router();
 
+router.get("/public", getPublicEntries);
 router.get("/", authenticateJWT, getUserEntries);
 router.get("/search", authenticateJWT, searchEntries);
-router.get("/public", getPublicEntries);
 router.get("/trash", authenticateJWT, getTrashedEntries);
 router.patch("/trash/:id/restore", authenticateJWT, restoreEntry);
 router.delete("/trash/:id", authenticateJWT, permanentlyDeleteEntry);

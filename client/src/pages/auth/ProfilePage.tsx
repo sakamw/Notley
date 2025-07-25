@@ -77,7 +77,7 @@ const ProfilePage = () => {
       ) {
         setError(
           (err.response.data as { message?: string }).message ||
-            "Failed to update profile.",
+            "Failed to update profile."
         );
       } else {
         setError("Failed to update profile.");
@@ -111,7 +111,7 @@ const ProfilePage = () => {
       ) {
         setPasswordError(
           (err.response.data as { message?: string }).message ||
-            "Failed to update password.",
+            "Failed to update password."
         );
       } else {
         setPasswordError("Failed to update password.");
@@ -122,14 +122,14 @@ const ProfilePage = () => {
   const handleDeactivate = async () => {
     if (
       window.confirm(
-        "Are you sure you want to deactivate your account? This action cannot be undone.",
+        "Are you sure you want to deactivate your account? This action cannot be undone."
       )
     ) {
       try {
         await axiosInstance.patch("/users/deactivate");
         logoutUser();
         localStorage.removeItem("authToken");
-        localStorage.removeItem("zustand-persist-BlogIt");
+        localStorage.removeItem("zustand-persist-Notely");
         window.location.href = "/";
         window.location.reload();
       } catch {
@@ -160,8 +160,8 @@ const ProfilePage = () => {
               {!user?.avatar && user?.firstName && user?.lastName
                 ? `${user.firstName[0]}${user.lastName[0]}`
                 : !user?.avatar && user?.firstName
-                  ? user.firstName[0]
-                  : "U"}
+                ? user.firstName[0]
+                : "U"}
             </Avatar>
             <Box>
               <Typography variant="h5" fontWeight={700} gutterBottom>

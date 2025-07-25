@@ -16,7 +16,7 @@ const PublicNoteCard = ({ title, synopsis, author }: PublicNoteCardProps) => (
       maxWidth: 600,
       width: "100%",
       borderRadius: 3,
-      boxShadow: "0 2px 16px 0 rgba(0,0,0,0.08)",
+      boxShadow: "0 .2rem 1.6rem 0 rgba(0,0,0,0.08)",
     }}
   >
     <Stack direction="row" alignItems="center" spacing={2} mb={2}>

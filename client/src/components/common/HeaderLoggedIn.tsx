@@ -29,7 +29,7 @@ function HeaderLoggedIn() {
 
   return (
     <>
-      {/* Sidebar only on md+ screens */}
+      {/* Sidebar  */}
       {!isMobile && (
         <Sidebar
           collapsed={sidebarCollapsed}
@@ -106,7 +106,7 @@ function HeaderLoggedIn() {
           >
             <NoteSearch />
           </Box>
-          {/* Right Side: New Note Button & Avatar */}
+          {/* New Note Button & Avatar */}
           <Stack direction="row" spacing={2} alignItems="center">
             <Box sx={{ display: { xs: "none", sm: "block" } }}>
               <Button

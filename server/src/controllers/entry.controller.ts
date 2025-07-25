@@ -41,7 +41,7 @@ export const createEntry = async (req: AuthRequest, res: Response) => {
   try {
     const userId = String(req.user?.id);
     if (!userId) return res.status(401).json({ message: "Unauthorized." });
-    const { title, synopsis, content, categoryId, isPublic, tags } = req.body;
+    const { title, synopsis, content, isPublic, tags } = req.body;
     if (!title || !content) {
       return res
         .status(400)
@@ -67,7 +67,7 @@ export const updateEntry = async (req: AuthRequest, res: Response) => {
   try {
     const userId = String(req.user?.id);
     const { id } = req.params;
-    const { title, synopsis, content, isDeleted, categoryId, isPublic, tags } =
+    const { title, synopsis, content, isDeleted, isPublic, tags } =
       req.body;
     const entry = await client.entry.findFirst({
       where: { id, authorId: userId, isDeleted: false },
@@ -78,7 +78,6 @@ export const updateEntry = async (req: AuthRequest, res: Response) => {
     if (synopsis !== undefined) updateData.synopsis = synopsis;
     if (content !== undefined) updateData.content = content;
     if (isDeleted !== undefined) updateData.isDeleted = isDeleted;
-    if (categoryId !== undefined) updateData.categoryId = categoryId;
     if (isPublic !== undefined) updateData.isPublic = isPublic === true;
     if (tags !== undefined) updateData.tags = tags;
     const updated = await client.entry.update({
@@ -112,7 +111,8 @@ export const searchEntries = async (req: AuthRequest, res: Response) => {
     if (!userId) return res.status(401).json({ message: "Unauthorized." });
     const { q } = req.query;
     if (!q || typeof q !== "string") {
-      return res.status(400).json({ message: "Missing search query." });
+      res.status(400).json({ message: "Missing search query." });
+      return;
     }
     const entries = await client.entry.findMany({
       where: {
@@ -179,7 +179,7 @@ export const restoreEntry = async (req: AuthRequest, res: Response) => {
 
 export const permanentlyDeleteEntry = async (
   req: AuthRequest,
-  res: Response,
+  res: Response
 ) => {
   try {
     const userId = String(req.user?.id);

@@ -9,7 +9,7 @@ function Features() {
       id="features"
       py={10}
       bgcolor="background.default"
-      sx={{ scrollMarginTop: { xs: "56px", sm: "64px" } }}
+      sx={{ scrollMarginTop: { xs: "5.6rem", sm: "6.4rem" } }}
     >
       <Container maxWidth="lg">
         <Typography variant="h3" align="center" fontWeight={700} mb={6}>

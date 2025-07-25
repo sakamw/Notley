@@ -18,7 +18,7 @@ function ForgotPassword() {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMsg, setSnackbarMsg] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
-    "success",
+    "success"
   );
 
   const { isPending, mutate } = useMutation({
@@ -26,7 +26,7 @@ function ForgotPassword() {
     mutationFn: async (payload: { email: string }) => {
       const response = await axiosInstance.post(
         "/auth/forgot-password",
-        payload,
+        payload
       );
       return response.data;
     },
@@ -81,7 +81,7 @@ function ForgotPassword() {
           Reset Password
         </Typography>
         <Typography variant="body2" align="center" color="text.primary" mb={3}>
-          Enter your email to receive reset instructions
+          Enter your email to receive reset link
         </Typography>
         <Box component="form" onSubmit={handleSubmit} noValidate>
           <TextField
@@ -101,7 +101,7 @@ function ForgotPassword() {
             type="submit"
             disabled={isPending}
           >
-            {isPending ? "Sending..." : "Send Reset Instructions"}
+            {isPending ? "Sending..." : "Send Reset link"}
           </Button>
           <Box mt={2}>
             <Link

@@ -11,7 +11,7 @@ cloudinary.v2.config({
 
 export const getCurrentUser = async (
   req: AuthRequest,
-  res: Response,
+  res: Response
 ): Promise<void> => {
   try {
     const userId = String(req.user?.id);
@@ -164,10 +164,10 @@ export const uploadUserAvatar = async (req: AuthRequest, res: Response) => {
               { quality: "auto", fetch_format: "auto" },
             ],
           },
-          (error, result) => {
-            if (error) return reject(error);
+          (e, result) => {
+            if (e) return reject(e);
             resolve(result);
-          },
+          }
         )
         .end(req.file!.buffer);
     });
@@ -194,7 +194,6 @@ export const uploadUserAvatar = async (req: AuthRequest, res: Response) => {
       user: updatedUser,
     });
   } catch (e) {
-    console.error("Avatar upload error:", e);
     res.status(500).json({ message: "Failed to upload profile picture." });
   }
 };

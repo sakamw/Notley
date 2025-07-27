@@ -11,6 +11,7 @@ import {
   restoreEntry,
   permanentlyDeleteEntry,
   pinEntry,
+  summarizeEntry,
 } from "../controllers/entry.controller";
 import { authenticateJWT } from "../middlewares/userMiddleware";
 
@@ -27,5 +28,7 @@ router.post("/", authenticateJWT, createEntry);
 router.put("/:id", authenticateJWT, updateEntry);
 router.delete("/:id", authenticateJWT, deleteEntry);
 router.patch("/:id/pin", authenticateJWT, pinEntry);
+router.post("/summarize", authenticateJWT, summarizeEntry);
+router.post("/:id/summarize", authenticateJWT, summarizeEntry);
 
 export default router;

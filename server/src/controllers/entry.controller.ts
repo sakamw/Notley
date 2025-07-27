@@ -1,8 +1,17 @@
 import { Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import { AuthRequest } from "../middlewares/userMiddleware";
+import OpenAI from "openai";
 
 const client = new PrismaClient();
+
+// Initialize OpenAI client only if API key is available
+let openai: OpenAI | null = null;
+if (process.env.OPENAI_API_KEY) {
+  openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+}
 
 export const getUserEntries = async (req: AuthRequest, res: Response) => {
   try {
@@ -178,7 +187,7 @@ export const restoreEntry = async (req: AuthRequest, res: Response) => {
 
 export const permanentlyDeleteEntry = async (
   req: AuthRequest,
-  res: Response,
+  res: Response
 ) => {
   try {
     const userId = String(req.user?.id);
@@ -211,5 +220,80 @@ export const pinEntry = async (req: AuthRequest, res: Response) => {
     res.json(updated);
   } catch (e) {
     res.status(500).json({ message: "Failed to pin/unpin entry." });
+  }
+};
+
+export const summarizeEntry = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = String(req.user?.id);
+    if (!userId) return res.status(401).json({ message: "Unauthorized." });
+
+    const { id } = req.params;
+    const { content } = req.body;
+
+    let textToSummarize = content;
+
+    // Verifying the entry exists and belongs to user
+    if (id) {
+      const entry = await client.entry.findFirst({
+        where: { id, authorId: userId, isDeleted: false },
+      });
+
+      if (!entry) return res.status(404).json({ message: "Entry not found." });
+
+      textToSummarize = content || entry.content;
+    }
+
+    // If no content provided and no entry found we return an error
+    if (!textToSummarize)
+      return res
+        .status(400)
+        .json({ message: "Content is required for summarization." });
+
+    if (!textToSummarize || textToSummarize.trim().length < 50)
+      return res.status(400).json({
+        message:
+          "Content is too short to summarize. Please write at least 50 characters.",
+      });
+
+    if (!openai)
+      return res.status(500).json({
+        message:
+          "AI summarization is not configured. Please contact the administrator.",
+      });
+
+    // Generating summary using OpenAI
+    const completion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a helpful assistant that creates concise, informative summaries of notes. Focus on the main points and key insights. Keep summaries clear and well-structured.",
+        },
+        {
+          role: "user",
+          content: `Please summarize the following note content in 2-3 sentences, capturing the main ideas and key points:\n\n${textToSummarize}`,
+        },
+      ],
+      max_tokens: 150,
+      temperature: 0.3,
+    });
+
+    const summary = completion.choices[0]?.message?.content?.trim();
+
+    if (!summary)
+      return res.status(500).json({ message: "Failed to generate summary." });
+
+    res.json({
+      summary,
+      originalLength: textToSummarize.length,
+      summaryLength: summary.length,
+    });
+  } catch (e) {
+    console.error("Summarization error:", e);
+    res.status(500).json({
+      message: "Failed to generate summary. Please try again later.",
+    });
   }
 };

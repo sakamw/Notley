@@ -53,7 +53,7 @@ function ThemedAppContent() {
 
   const dynamicTheme = useMemo(
     () => createDynamicTheme(themeMode),
-    [themeMode],
+    [themeMode]
   );
 
   const alwaysLightRoutes = [
@@ -199,12 +199,12 @@ function AppContent() {
   );
 }
 
-function App() {
+const App = () => {
   return (
     <BrowserRouter>
       <ThemedAppContent />
     </BrowserRouter>
   );
-}
+};
 
 export default App;

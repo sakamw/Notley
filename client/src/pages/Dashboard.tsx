@@ -84,7 +84,7 @@ const Dashboard = () => {
     try {
       await axiosInstance.patch(`/entries/${noteId}/pin`, { pinned });
       setNotes((prev) =>
-        prev.map((note) => (note.id === noteId ? { ...note, pinned } : note)),
+        prev.map((note) => (note.id === noteId ? { ...note, pinned } : note))
       );
       if (pinned) {
         toast.success("Note pinned");
@@ -123,15 +123,16 @@ const Dashboard = () => {
         mt: { xs: "56px", sm: "56px" },
         ml: { xs: 0, sm: `${sidebarWidth}px` },
         p: { xs: 0, sm: 3 },
-        minHeight: "calc(100vh - 56px)",
+        height: "calc(100vh - 56px)",
         bgcolor: "background.default",
-        width: "100vw",
-        maxWidth: "100vw",
+        width: "100%",
+        maxWidth: "100%",
         boxSizing: "border-box",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         overflowX: "hidden",
+        overflowY: "auto",
       }}
     >
       <Typography

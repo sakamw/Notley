@@ -45,7 +45,7 @@ function HeaderLoggedIn() {
           zIndex: 1000,
           height: 56,
           left: 0,
-          width: "100vw",
+          width: "100%",
         }}
       >
         <Toolbar

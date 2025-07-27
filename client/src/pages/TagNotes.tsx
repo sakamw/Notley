@@ -36,8 +36,8 @@ const TagNotes = () => {
           res.data.filter((note: Note) =>
             note.tags
               .map((t) => t.trim().toLowerCase())
-              .includes((tag || "").toLowerCase()),
-          ),
+              .includes((tag || "").toLowerCase())
+          )
         );
       } catch {
         setError("Failed to fetch notes.");
@@ -114,7 +114,7 @@ const TagNotes = () => {
                       key={t}
                       variant="caption"
                       sx={{
-                        bgcolor: "#e3e8f0",
+                        bgcolor: "#e3e8",
                         px: 1,
                         borderRadius: 1,
                         mb: 0.5,

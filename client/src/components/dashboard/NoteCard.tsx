@@ -78,7 +78,7 @@ const NoteCard: React.FC<NoteCardProps> = ({
         border: `1px solid ${theme.palette.divider}`,
       }}
     >
-      {/* Header row: title + actions */}
+      {/* Title and actions */}
       <Box
         sx={{
           display: "flex",

@@ -36,8 +36,8 @@ const TagNotes = () => {
           res.data.filter((note: Note) =>
             note.tags
               .map((t) => t.trim().toLowerCase())
-              .includes((tag || "").toLowerCase())
-          )
+              .includes((tag || "").toLowerCase()),
+          ),
         );
       } catch {
         setError("Failed to fetch notes.");

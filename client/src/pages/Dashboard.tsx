@@ -84,7 +84,7 @@ const Dashboard = () => {
     try {
       await axiosInstance.patch(`/entries/${noteId}/pin`, { pinned });
       setNotes((prev) =>
-        prev.map((note) => (note.id === noteId ? { ...note, pinned } : note))
+        prev.map((note) => (note.id === noteId ? { ...note, pinned } : note)),
       );
       if (pinned) {
         toast.success("Note pinned");

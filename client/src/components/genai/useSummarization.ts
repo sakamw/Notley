@@ -14,7 +14,7 @@ export const useSummarization = () => {
 
   const summarizeContent = async (
     content: string,
-    entryId?: string
+    entryId?: string,
   ): Promise<SummarizationResult | null> => {
     if (!content || content.trim().length < 50) {
       toast.error("Please write at least 50 characters to generate a summary.");

@@ -113,6 +113,7 @@ const EditNote = () => {
     <>
       <NoteEditor
         mode="edit"
+        entryId={id}
         initialTitle={note.title}
         initialSynopsis={note.synopsis}
         initialContent={note.content}

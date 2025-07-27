@@ -5,7 +5,6 @@ import OpenAI from "openai";
 
 const client = new PrismaClient();
 
-// Initialize OpenAI client only if API key is available
 let openai: OpenAI | null = null;
 if (process.env.OPENAI_API_KEY) {
   openai = new OpenAI({

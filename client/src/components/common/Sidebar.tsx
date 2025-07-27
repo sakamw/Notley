@@ -47,15 +47,16 @@ const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
         width: collapsed ? 64 : 220,
         bgcolor: "#2d3842",
         color: "#fff",
-        height: { xs: "100vh", sm: "calc(100vh - 5.6rem)" },
+        height: "calc(100vh - 56px)",
         display: "flex",
         flexDirection: "column",
         borderRight: "1px solid #1a222b",
-        position: { xs: "absolute", sm: "fixed" },
-        top: { xs: 0, sm: 56 },
+        position: "fixed",
+        top: 56,
         left: 0,
         zIndex: 1200,
         transition: "width 0.2s cubic-bezier(.4,0,.2,1)",
+        overflow: "hidden",
       }}
     >
       <Box sx={{ flex: 1, minHeight: 0, overflowY: "auto" }}>

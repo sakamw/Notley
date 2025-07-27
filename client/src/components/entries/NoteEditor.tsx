@@ -3,7 +3,7 @@ import { Box, TextField, useTheme } from "@mui/material";
 import { usePublicNotes } from "../../store/useStore";
 import { useAuth } from "../../store/useStore";
 import { toast } from "react-toastify";
-import { useSummarization, SummaryDialog } from "../openai";
+import { useSummarization, SummaryDialog } from "../genai";
 import {
   NoteActionsMenu,
   NoteHeader,

@@ -2,11 +2,11 @@
 
 ## Overview
 
-The AI summarization feature allows users to automatically generate concise summaries of their notes using OpenAI's GPT-3.5-turbo model. This feature helps users quickly understand the main points of their notes and can be used to populate the synopsis field.
+The AI summarization feature allows users to automatically generate concise summaries of their notes using Google's Gemini AI model. This feature helps users quickly understand the main points of their notes and can be used to populate the synopsis field.
 
 ## Features
 
-- **Smart Summarization**: Uses OpenAI's GPT-3.5-turbo to generate intelligent, context-aware summaries
+- **Smart Summarization**: Uses Google's Gemini 1.5 Flash to generate intelligent, context-aware summaries
 - **Minimum Content Requirement**: Requires at least 50 characters to ensure meaningful summaries
 - **Real-time Feedback**: Shows loading state and success/error messages
 - **Flexible Usage**: Works for both new notes and existing notes
@@ -18,14 +18,14 @@ The AI summarization feature allows users to automatically generate concise summ
 
 #### Dependencies
 
-- `openai`: ^4.68.0 - For AI summarization functionality
+- `@google/generative-ai`: ^0.24.1 - For AI summarization functionality
 
 #### Environment Variables
 
 Add the following to your `.env` file:
 
 ```env
-OPENAI_API_KEY=your_openai_api_key_here
+GOOGLE_AI_API_KEY=your_google_ai_api_key_here
 ```
 
 #### API Endpoints
@@ -92,12 +92,12 @@ OPENAI_API_KEY=your_openai_api_key_here
 
 ### For Developers
 
-#### Setting Up OpenAI API
+#### Setting Up Google AI API
 
-1. Get an OpenAI API key from [OpenAI Platform](https://platform.openai.com/)
+1. Get a Google AI API key from [Google AI Studio](https://aistudio.google.com/)
 2. Add the API key to your server's `.env` file:
    ```env
-   OPENAI_API_KEY=sk-your-api-key-here
+   GOOGLE_AI_API_KEY=your-api-key-here
    ```
 3. Restart your server
 

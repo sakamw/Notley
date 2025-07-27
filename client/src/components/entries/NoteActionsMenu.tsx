@@ -1,6 +1,6 @@
 import { Box, IconButton, Menu, MenuItem } from "@mui/material";
 import { MoreVert, Public, Delete } from "@mui/icons-material";
-import { SummarizeButton } from "../openai";
+import { SummarizeButton } from "../genai";
 
 interface NoteActionsMenuProps {
   menuAnchor: HTMLElement | null;

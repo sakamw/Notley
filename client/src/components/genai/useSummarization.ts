@@ -43,7 +43,6 @@ export const useSummarization = () => {
     } catch (error: unknown) {
       console.error("Summarization error:", error);
 
-      // Try to extract the actual error message from the response
       let errorMessage = "Failed to generate summary.";
 
       if (error && typeof error === "object" && "response" in error) {

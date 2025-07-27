@@ -1,15 +1,13 @@
 import { Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import { AuthRequest } from "../middlewares/userMiddleware";
-import OpenAI from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const client = new PrismaClient();
 
-let openai: OpenAI | null = null;
-if (process.env.OPENAI_API_KEY) {
-  openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-  });
+let ai: GoogleGenerativeAI | null = null;
+if (process.env.GOOGLE_AI_API_KEY) {
+  ai = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY);
 }
 
 export const getUserEntries = async (req: AuthRequest, res: Response) => {
@@ -232,7 +230,6 @@ export const summarizeEntry = async (req: AuthRequest, res: Response) => {
 
     let textToSummarize = content;
 
-    // Verifying the entry exists and belongs to user
     if (id) {
       const entry = await client.entry.findFirst({
         where: { id, authorId: userId, isDeleted: false },
@@ -243,7 +240,6 @@ export const summarizeEntry = async (req: AuthRequest, res: Response) => {
       textToSummarize = content || entry.content;
     }
 
-    // If no content provided and no entry found we return an error
     if (!textToSummarize)
       return res
         .status(400)
@@ -255,31 +251,19 @@ export const summarizeEntry = async (req: AuthRequest, res: Response) => {
           "Content is too short to summarize. Please write at least 50 characters.",
       });
 
-    if (!openai)
+    if (!ai)
       return res.status(500).json({
         message:
           "AI summarization is not configured. Please contact the administrator.",
       });
 
-    // Generating summary using OpenAI
-    const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are a helpful assistant that creates concise, informative summaries of notes. Focus on the main points and key insights. Keep summaries clear and well-structured.",
-        },
-        {
-          role: "user",
-          content: `Please summarize the following note content in 2-3 sentences, capturing the main ideas and key points:\n\n${textToSummarize}`,
-        },
-      ],
-      max_tokens: 150,
-      temperature: 0.3,
-    });
+    const model = ai.getGenerativeModel({ model: "models/gemini-1.5-flash" });
 
-    const summary = completion.choices[0]?.message?.content?.trim();
+    const prompt = `You are a helpful assistant that creates concise, informative summaries of notes. Focus on the main points and key insights. Keep summaries clear and well-structured. Please summarize the following note content in 2-3 sentences, capturing the main ideas and key points: ${textToSummarize}`;
+
+    const result = await model.generateContent(prompt);
+    const response = result.response;
+    const summary = response.text().trim();
 
     if (!summary)
       return res.status(500).json({ message: "Failed to generate summary." });

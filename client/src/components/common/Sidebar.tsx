@@ -31,7 +31,7 @@ const shortcuts = [
 ];
 
 const tags = [
-  { label: "reference", icon: <LabelIcon />, route: "/tags/reference" },
+  { label: "Reference", icon: <LabelIcon />, route: "/tags/reference" },
 ];
 
 interface SidebarProps {

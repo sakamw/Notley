@@ -7,7 +7,7 @@ export const staticLightTheme = createTheme({
     background: { default: "#f0f6ff", paper: "#fff" },
     text: { primary: "#191b2b", secondary: "#0172fa" },
   },
-  typography: { fontFamily: '"Times New Roman", serif' },
+  typography: { fontFamily: '"Montserrat", sans-serif' },
   components: {
     MuiInputBase: {
       styleOverrides: {
@@ -47,7 +47,7 @@ export function createDynamicTheme(themeMode: "light" | "dark"): Theme {
         disabled: themeMode === "dark" ? "#b0b8c1" : undefined,
       },
     },
-    typography: { fontFamily: '"Times New Roman", serif' },
+    typography: { fontFamily: '"Montserrat", sans-serif' },
     components: {
       MuiInputBase: {
         styleOverrides: {

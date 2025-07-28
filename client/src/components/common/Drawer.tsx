@@ -20,10 +20,10 @@ import NoteAddIcon from "@mui/icons-material/NoteAdd";
 import { useNavigate } from "react-router-dom";
 
 const navItems = [
-  { label: "NOTES", icon: <DescriptionIcon />, route: "/dashboard" },
-  { label: "DRAFTS", icon: <DraftsIcon />, route: "/drafts" },
-  { label: "TRASH", icon: <DeleteIcon />, route: "/trash" },
-  { label: "BOOKMARKS", icon: <BookmarkIcon />, route: "/bookmarks" },
+  { label: "Notes", icon: <DescriptionIcon />, route: "/dashboard" },
+  { label: "Drafts", icon: <DraftsIcon />, route: "/drafts" },
+  { label: "Trash", icon: <DeleteIcon />, route: "/trash" },
+  { label: "Bookmarks", icon: <BookmarkIcon />, route: "/bookmarks" },
 ];
 
 const shortcuts = [
@@ -31,7 +31,7 @@ const shortcuts = [
 ];
 
 const tags = [
-  { label: "reference", icon: <LabelIcon />, route: "/tags/reference" },
+  { label: "Reference", icon: <LabelIcon />, route: "/tags/reference" },
 ];
 
 interface DrawerMenuProps {

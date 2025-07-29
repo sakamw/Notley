@@ -6,8 +6,8 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 const client = new PrismaClient();
 
 let ai: GoogleGenerativeAI | null = null;
-if (process.env.GOOGLE_AI_API_KEY) {
-  ai = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY);
+if (process.env.GENAI_API_KEY) {
+  ai = new GoogleGenerativeAI(process.env.GENAI_API_KEY);
 }
 
 export const getUserEntries = async (req: AuthRequest, res: Response) => {
@@ -184,7 +184,7 @@ export const restoreEntry = async (req: AuthRequest, res: Response) => {
 
 export const permanentlyDeleteEntry = async (
   req: AuthRequest,
-  res: Response,
+  res: Response
 ) => {
   try {
     const userId = String(req.user?.id);
@@ -259,7 +259,9 @@ export const summarizeEntry = async (req: AuthRequest, res: Response) => {
 
     const model = ai.getGenerativeModel({ model: "models/gemini-1.5-flash" });
 
-    const prompt = `You are a helpful assistant that creates concise, informative summaries of notes. Focus on the main points and key insights. Keep summaries clear and well-structured. Please summarize the following note content in 2-3 sentences, capturing the main ideas and key points: ${textToSummarize}`;
+    const prompt = `You are a helpful assistant that creates concise, informative summaries of notes. 
+    Focus on the main points and key insights. Keep summaries clear and well-structured. 
+    Please summarize the following note content in 2-3 sentences, capturing the main ideas and key points: ${textToSummarize}`;
 
     const result = await model.generateContent(prompt);
     const response = result.response;

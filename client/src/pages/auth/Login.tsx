@@ -72,7 +72,6 @@ function Login() {
       }
       setUser(data);
       toast.success("Welcome Back!");
-      // Redirect to  requested page or dashboard by default
       const from =
         (location.state as { from?: Location })?.from?.pathname || "/dashboard";
       navigate(from, { replace: true });

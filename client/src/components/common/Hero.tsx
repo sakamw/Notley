@@ -25,7 +25,7 @@ function Hero() {
         }}
       >
         <img
-          src="/logo.png"
+          src="/logo.jpg"
           alt="Notely Logo"
           style={{
             width: 180,

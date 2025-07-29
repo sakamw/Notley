@@ -73,7 +73,7 @@ function HeaderLoggedIn() {
             )}
             <Box sx={{ display: { xs: "none", sm: "block" } }}>
               <img
-                src="/logo.jpg"
+                src="/logo.png"
                 alt="Logo"
                 style={{
                   height: 32,

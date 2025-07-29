@@ -56,7 +56,7 @@ function HeaderPublic() {
           }}
         >
           <img
-            src="/logo.jpg"
+            src="/logo.png"
             alt="Logo"
             style={{ height: 28, marginRight: 8, verticalAlign: "middle" }}
           />

@@ -1,11 +1,13 @@
 import { Box, Typography, Stack } from "@mui/material";
 import PublicNoteCard from "../components/common/PublicNoteCard";
 import { usePublicNotes } from "../store/useStore";
+import Hero from "../components/common/Hero";
 
 function LandingPage() {
   const { publicNotes } = usePublicNotes();
   return (
     <>
+      <Hero />
       {/* Public Notes Section */}
       <Box sx={{ py: 6, bgcolor: "background.default" }}>
         <Typography variant="h3" align="center" fontWeight={700} mb={4}>

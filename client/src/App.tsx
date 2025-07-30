@@ -5,7 +5,6 @@ import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import Header from "./pages/Header";
-import Footer from "./components/common/Footer";
 import LandingPage from "./pages/LandingPage";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -53,7 +52,7 @@ function ThemedAppContent() {
 
   const dynamicTheme = useMemo(
     () => createDynamicTheme(themeMode),
-    [themeMode],
+    [themeMode]
   );
 
   const alwaysLightRoutes = [
@@ -92,8 +91,6 @@ function AuthInitializer() {
 }
 
 function AppContent() {
-  const { isAuthenticated } = useAuth();
-  const location = useLocation();
   return (
     <>
       <AuthInitializer />
@@ -187,14 +184,6 @@ function AppContent() {
         />
         <Route path="/resend-activation" element={<ResendActivation />} />
       </Routes>
-      {!isAuthenticated &&
-        ![
-          "/login",
-          "/signup",
-          "/forgot-password",
-          "/activate/:id/:token",
-          "/reset-password/:id/:token",
-        ].includes(location.pathname) && <Footer />}
     </>
   );
 }

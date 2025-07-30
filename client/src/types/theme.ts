@@ -20,6 +20,7 @@ export const staticLightTheme = createTheme({
   },
 });
 
+// This will check for stored theme in the system and work with that theme in the notely-app
 export function getPreferredTheme(THEME_KEY: string): "light" | "dark" {
   const stored = localStorage.getItem(THEME_KEY);
   if (stored === "light" || stored === "dark") return stored;
